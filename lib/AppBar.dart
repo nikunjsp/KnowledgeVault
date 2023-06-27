@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'SettingsPage.dart';
 
 class Bar extends StatefulWidget implements PreferredSizeWidget{
   const Bar({Key? key}) : super(key: key);
@@ -26,8 +27,10 @@ class _BarState extends State<Bar>  {
               icon: const Icon(Icons.settings,color: Colors.white,),
               tooltip: 'Settings',
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('This is a setting page')));
+                Navigator.push(
+                  context,
+                 MaterialPageRoute(builder: (context) => SettingsPage()),
+                 );
               },
             ),
           ],
