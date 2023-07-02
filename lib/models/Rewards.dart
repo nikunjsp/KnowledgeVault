@@ -12,23 +12,23 @@ class Rewards {
 
 List<Rewards> rewardlist = [
   Rewards(
-      picture: 'assets/icons/laptop.jpg',
-      rewardname: 'bestbuy',
+      picture: 'laptop',
+      rewardname: 'Bestbuy',
       description:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
   Rewards(
-      picture: 'assets/icons/accounting.jpg',
-      rewardname: 'bestbuy',
+      picture: 'accounting',
+      rewardname: 'Starbucks',
       description:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
   Rewards(
-      picture: 'assets/icons/design.jpg',
-      rewardname: 'bestbuy',
+      picture: 'design',
+      rewardname: 'Pizza Pizza',
       description:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
   Rewards(
-      picture: 'assets/icons/laptop.jpg',
-      rewardname: 'bestbuy',
+      picture: 'laptop',
+      rewardname: 'Tim Hortons',
       description:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
 ];

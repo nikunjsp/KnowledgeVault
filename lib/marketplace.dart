@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:knowledgevault/HomePage.dart';
 import 'models/Rewards.dart';
 import 'myrewards.dart';
 import 'mycourses.dart';
 import 'faq.dart';
+import 'package:knowledgevault/redeemItem.dart';
 
 class marketplace extends StatefulWidget {
   const marketplace({super.key});
@@ -122,7 +124,14 @@ class _marketplaceState extends State<marketplace> {
                                     foregroundColor: Colors.white,
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const redeemItem()),
+                                    );
+                                  },
                                   child: const Text('Redeem Now'),
                                 ),
 
@@ -173,6 +182,11 @@ class _marketplaceState extends State<marketplace> {
               MaterialPageRoute(builder: (context) => const marketplace()),
             );
           } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+
             // No action needed
           } else if (index == 3) {
             Navigator.push(

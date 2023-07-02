@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'HomePage.dart';
 import 'models/Rewards.dart';
 import 'marketplace.dart';
 import 'mycourses.dart';
@@ -74,7 +75,7 @@ class _myrewardsState extends State<myrewards> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     childAspectRatio:
-                        (MediaQuery.of(context).size.height) / (1 * 300),
+                        (MediaQuery.of(context).size.height) / (1 * 350),
                     mainAxisSpacing: 20,
                     crossAxisSpacing: 20,
                   ),
@@ -177,6 +178,10 @@ class _myrewardsState extends State<myrewards> {
               MaterialPageRoute(builder: (context) => const marketplace()),
             );
           } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
             // No action needed
           } else if (index == 3) {
             Navigator.push(
