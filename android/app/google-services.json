@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "5308504649",
+    "firebase_url": "https://knowledgevault-a5cae-default-rtdb.firebaseio.com",
+    "project_id": "knowledgevault-a5cae",
+    "storage_bucket": "knowledgevault-a5cae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5308504649:android:3a7f6be46644e6bae17d98",
+        "android_client_info": {
+          "package_name": "com.example.knowledgevault"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5308504649-o77imf1itmrphqrs8crpfprmr9dpso6v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChN65RdE21hqJG-K1ocDmQQ8LRaWn5Xgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5308504649-o77imf1itmrphqrs8crpfprmr9dpso6v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
