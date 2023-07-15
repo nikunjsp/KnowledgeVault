@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'LoginScreen.dart';
+import 'AuthService.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +32,9 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
+  final DatabaseReference _userRef =
+  FirebaseDatabase.instance.reference().child('Users');
 
   @override
   void dispose() {
@@ -99,22 +104,40 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState?.validate() == true) {
       String firstName = _firstNameController.text;
       String lastName = _lastNameController.text;
       String phoneNumber = _phoneNumberController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
-      String confirmPassword = _confirmPasswordController.text;
 
-      bool isSignedUp = true;
+      try {
+        // Register user with email and password
+        await _authService.registerWithEmailAndPassword(email, password);
+        // Handle successful registration
 
-      if (isSignedUp) {
+        // Generate a unique user ID
+        String? userId = _userRef.push().key ?? '';
+
+        // Create a map of user data
+        Map<String, dynamic> userData = {
+          'firstName': firstName,
+          'lastName': lastName,
+          'phoneNumber': phoneNumber,
+          'email': email,
+          // Add additional fields as needed
+        };
+
+        // Store the user data in the database
+        _userRef.child(userId).set(userData);
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
+      } catch (e) {
+        // Handle registration errors
       }
     }
   }
