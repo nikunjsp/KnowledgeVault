@@ -5,14 +5,14 @@ class PrivacyPolicyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Privacy Policy',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Color.fromRGBO(116, 85, 247, 1),
+        backgroundColor: const Color.fromRGBO(116, 85, 247, 1),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
@@ -20,8 +20,8 @@ class PrivacyPolicyPage extends StatelessWidget {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
+        padding: const EdgeInsets.all(20),
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
@@ -50,7 +50,12 @@ Contact Us
 
 If you have any questions about this Privacy Policy, please contact us.
 ''',
-                  style: TextStyle(fontSize: 16),
+                  style:TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                 ),
               ),
             ),

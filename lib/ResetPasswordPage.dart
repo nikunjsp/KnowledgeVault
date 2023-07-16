@@ -86,14 +86,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: ElevatedButton(
                   onPressed: _resetPassword,
-                  child: Text('Reset Password'),
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(116, 85, 247, 0.1),
+                    backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                     padding: EdgeInsets.all(16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
+                  ), child: const Text('Reset Password', 
+                  style: TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),),
                 ),
               ),
             ),

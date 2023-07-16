@@ -96,14 +96,20 @@ Widget build(BuildContext context) {
               width: MediaQuery.of(context).size.width * 0.8,
               child: ElevatedButton(
                 onPressed: _editDetails,
-                child: Text('Edit Details'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromRGBO(116, 85, 247, 0.1),
+                  backgroundColor: Color.fromRGBO(246, 245, 251, 1),
                   padding: EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                child: const Text('Edit Details', 
+                  style: TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),),
               ),
             ),
           ),
@@ -113,14 +119,21 @@ Widget build(BuildContext context) {
               width: MediaQuery.of(context).size.width * 0.8,
               child: ElevatedButton(
                 onPressed: _editPassword,
-                child: Text('Edit Password'),
+                
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromRGBO(116, 85, 247, 0.1),
-                  padding: EdgeInsets.all(16),
+                  backgroundColor: Color.fromRGBO(246, 245, 251, 1),
+                  padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                child: const Text('Edit Password', 
+                  style: TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),),
               ),
             ),
           ),

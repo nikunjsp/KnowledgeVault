@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const faq()),
+              MaterialPageRoute(builder: (context) => faq()),
             );
           }
         },

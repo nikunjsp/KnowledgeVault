@@ -32,6 +32,7 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          
           children: [
             const SizedBox(height: 20),
             
@@ -46,11 +47,12 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
+                  // side: BorderSide(color: Color.fromRGBO(246, 245, 251, 1),
                 ),
               ),
               
@@ -58,20 +60,23 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.person,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Profile',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                                     fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
+            
             ElevatedButton(
               onPressed: () {
                 // Handle privacy policy button tap
@@ -82,7 +87,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -92,15 +97,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.lock,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Privacy Policy',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),
@@ -116,7 +123,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -126,15 +133,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.info,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'About',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),
@@ -150,7 +159,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -160,15 +169,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.logout,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Sign Out',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),
