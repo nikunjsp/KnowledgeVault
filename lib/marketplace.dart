@@ -196,7 +196,7 @@ class _marketplaceState extends State<marketplace> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const faq()),
+              MaterialPageRoute(builder: (context) =>  faq()),
             );
           }
         },

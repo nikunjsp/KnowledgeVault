@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'LoginScreen.dart';
 
 class SignOutPage extends StatelessWidget {
   @override
@@ -44,8 +45,10 @@ class SignOutPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle sign out button tap
-                    // Add your logic here
+                    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginScreen()),
+            );
                   },
                   child: Text('Sign Out'),
                   style: ElevatedButton.styleFrom(
@@ -63,7 +66,7 @@ class SignOutPage extends StatelessWidget {
                   },
                   child: Text('Cancel'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.grey[300],
+                    backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                     onPrimary: Colors.black,
                     padding: EdgeInsets.all(16),
                     shape: RoundedRectangleBorder(
