@@ -1,40 +1,31 @@
 class Courses {
-  String picture;
-  String coursename;
-  String description;
-  String duration;
+  
+  String thumbnail, coursename, description, duration;
 
   Courses({
-    required this.picture,
+    required this.thumbnail,
     required this.coursename,
     required this.description,
     required this.duration,
   });
-}
 
-List<Courses> courselist = [
-  Courses(
-      picture: 'node',
-      coursename: 'Back-end using Node JS',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      duration: '1hrs'),
-  Courses(
-      picture: 'python',
-      coursename: 'Basics of Python',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      duration: '1hrs 20mins'),
-  Courses(
-      picture: 'wordpress',
-      coursename: 'Website with wordpress',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      duration: '1hrs 45mins'),
-  Courses(
-      picture: 'react',
-      coursename: 'React for front-end',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      duration: '2hrs'),
-];
+  factory Courses.fromJson(Map<String, dynamic> json) {
+    return Courses(
+      thumbnail: json['thumbnail'],
+      coursename: json['coursename'],
+      description: json['description'],
+      duration: json['duration'],
+    );
+  }
+
+  Map<String,dynamic> toJson() {
+
+    final Map<String,dynamic> data = new Map<String,dynamic>();
+    data['thumbnail'] = this.thumbnail;
+    data['coursename'] = this.coursename;
+    data['description'] = this.description;
+    data['duration'] = this.duration;
+
+    return data;
+  }
+}
