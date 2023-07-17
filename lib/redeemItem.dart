@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:knowledgevault/myrewards.dart';
-import 'models/Rewards.dart';
 import 'models/redeemReward.dart';
 import 'package:knowledgevault/myrewards.dart';
 
 class redeemItem extends StatefulWidget {
-  const redeemItem({Key? key});
+  // const redeemItem({Key? key});
+  late final String name;
+  late final String picture;
+  late final String description;
+  late final int points;
+
+  redeemItem({
+    required this.name,
+    required this.description,
+    required this.points,
+    required this.picture,
+  });
 
   @override
   State<redeemItem> createState() => _redeemItemState();
 }
 
 class _redeemItemState extends State<redeemItem> {
+  // List<Reward> rewardList = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +95,8 @@ class _redeemItemState extends State<redeemItem> {
                             Padding(
                               padding: const EdgeInsets.all(0),
                               child: Image.asset(
-                                'assets/icons/${redeemRewardlist[index].picture}.jpg',
+                                // 'assets/icons/${redeemRewardlist[index].picture}.jpg',
+                                '${widget.picture}',
                                 width: 250,
                                 height: 300,
                               ),
@@ -95,7 +108,7 @@ class _redeemItemState extends State<redeemItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  redeemRewardlist[index].rewardname,
+                                  '${widget.name}',
                                   style: const TextStyle(
                                     fontFamily: 'RobotoMono',
                                     fontWeight: FontWeight.w600,
@@ -108,7 +121,8 @@ class _redeemItemState extends State<redeemItem> {
                             const SizedBox(height: 10),
                             Text(
                               textAlign: TextAlign.justify,
-                              redeemRewardlist[index].description,
+                              // redeemRewardlist[index].description,
+                              '${widget.description}',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
                                 fontStyle: FontStyle.italic,
