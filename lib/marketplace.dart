@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:knowledgevault/HomePage.dart';
-import 'models/Rewards.dart';
+import 'package:firebase_database/firebase_database.dart';
+// import 'models/Reward.dart';
 import 'myrewards.dart';
 import 'mycourses.dart';
 import 'faq.dart';
 import 'package:knowledgevault/redeemItem.dart';
+import 'HomePage.dart';
 
 class marketplace extends StatefulWidget {
   const marketplace({super.key});
@@ -14,6 +15,40 @@ class marketplace extends StatefulWidget {
 }
 
 class _marketplaceState extends State<marketplace> {
+  final DatabaseReference _rewardsRef =
+      FirebaseDatabase.instance.reference().child('RewardList');
+  List<Reward> rewardList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    try {
+      DatabaseEvent event = await _rewardsRef.once();
+      DataSnapshot snapshot = event.snapshot;
+      if (snapshot.value != null && snapshot.value is Map<dynamic, dynamic>) {
+        Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
+        print('Retrieved data: $data');
+        // print('Retrieved data: ${data.runtimeType}');
+        List<Reward> fetchedRewards = [];
+        data.forEach((key, value) {
+          Reward reward = Reward.fromMap(value);
+          fetchedRewards.add(reward);
+        });
+
+        setState(() {
+          rewardList =
+              fetchedRewards; // Update the rewardList with the fetched rewards
+        });
+      }
+    } catch (error) {
+      print('Error fetching rewards data: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +96,7 @@ class _marketplaceState extends State<marketplace> {
               children: [
                 const SizedBox(height: 20),
                 GridView.builder(
-                  itemCount: rewardlist.length,
+                  itemCount: rewardList.length,
                   shrinkWrap: true,
                   // physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -84,7 +119,7 @@ class _marketplaceState extends State<marketplace> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              rewardlist[index].rewardname,
+                              rewardList[index].name ?? '',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.w600,
@@ -94,7 +129,10 @@ class _marketplaceState extends State<marketplace> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              rewardlist[index].description,
+                              rewardList[index].description ?? '',
+                              maxLines:
+                                  1, // Specify the maximum number of lines to show
+                              overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.justify,
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
@@ -107,8 +145,10 @@ class _marketplaceState extends State<marketplace> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Price:100',
+                                Text(
+                                  // 'price:100',
+                                  // 'Price:' + rewardList[index].points.toString(),
+                                  'Price: ${rewardList[index].points}',
                                   style: TextStyle(
                                     fontFamily: 'RobotoMono',
                                     fontStyle: FontStyle.normal,
@@ -117,7 +157,6 @@ class _marketplaceState extends State<marketplace> {
                                     color: Color.fromRGBO(0, 0, 0, 1),
                                   ),
                                 ),
-
                                 TextButton(
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.blue,
@@ -125,19 +164,33 @@ class _marketplaceState extends State<marketplace> {
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
                                   onPressed: () {
+                                    print('Name: ${rewardList[index].name}');
+                                    print(
+                                        'Description: ${rewardList[index].description}');
+                                    print(
+                                        'Points: ${rewardList[index].points}');
+                                    print(
+                                        'picture: ${rewardList[index].picture}');
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const redeemItem()),
-                                    );
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => redeemItem(
+                                                  name:
+                                                      rewardList[index].name ??
+                                                          '',
+                                                  description: rewardList[index]
+                                                          .description ??
+                                                      '',
+                                                  picture: rewardList[index]
+                                                          .picture ??
+                                                      '',
+                                                  points: rewardList[index]
+                                                          .points ??
+                                                      0,
+                                                )));
                                   },
                                   child: const Text('Redeem Now'),
                                 ),
-
-                                // ElevatedButton(
-                                //     onPressed: () {},
-                                //     child: const Text('Button')
                               ],
                             ),
                           ],
@@ -196,11 +249,29 @@ class _marketplaceState extends State<marketplace> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  faq()),
+              MaterialPageRoute(builder: (context) => const faq()),
             );
           }
         },
       ),
+    );
+  }
+}
+
+class Reward {
+  String? description;
+  String? name;
+  int? points;
+  String? picture;
+
+  Reward({this.description, this.name, this.points, this.picture});
+
+  factory Reward.fromMap(Map<dynamic, dynamic> map) {
+    return Reward(
+      name: map['name'],
+      description: map['description'],
+      points: map['points'],
+      picture: map['picture'],
     );
   }
 }
