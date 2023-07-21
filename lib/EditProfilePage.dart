@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'ProfilePage.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final String initialName;
+  final String initialFirstName;
+  final String initialLastName;
   final String initialEmail;
   final String initialPhoneNumber;
 
   EditProfilePage({
-    required this.initialName,
+    required this.initialFirstName,
+    required this.initialLastName,
     required this.initialEmail,
     required this.initialPhoneNumber,
   });
@@ -17,40 +21,90 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  late TextEditingController _nameController;
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
+
+  DatabaseReference _userRef = FirebaseDatabase.instance.reference().child('Users');
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.initialName);
+    _firstNameController = TextEditingController(text: widget.initialFirstName);
+    _lastNameController = TextEditingController(text: widget.initialLastName);
     _emailController = TextEditingController(text: widget.initialEmail);
     _phoneController = TextEditingController(text: widget.initialPhoneNumber);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Perform the save operation and update the profile information
-    String newName = _nameController.text;
+  void _saveChanges() async {
+    String newFirstName = _firstNameController.text;
+    String newLastName = _lastNameController.text;
     String newEmail = _emailController.text;
     String newPhoneNumber = _phoneController.text;
 
-    // Add your logic to save the changes to the profile
+    User? user = FirebaseAuth.instance.currentUser;
 
-    // Return to the previous screen with the updated profile information
-    Navigator.pop(context, {
-      'name': newName,
-      'email': newEmail,
-      'phone': newPhoneNumber,
-    });
+    if (user != null) {
+      String email = user.email ?? '';
+
+      Map<String, dynamic> updatedUserData = {
+        'firstName': newFirstName,
+        'lastName': newLastName,
+        'phoneNumber': newPhoneNumber,
+        // Add other fields as needed
+      };
+
+      Query query = _userRef.orderByChild('email').equalTo(email);
+
+      try {
+        DataSnapshot snapshot =  (await query.once()).snapshot;
+
+        Map<dynamic, dynamic>? userData = snapshot.value as Map<dynamic, dynamic>?;
+
+        if (userData != null) {
+          String key = userData.keys.first;
+          await _userRef.child(key).update(updatedUserData);
+
+          // Return to the previous screen with the updated profile information
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context, {
+            'firstName': newFirstName,
+            'lastName': newLastName,
+            'email': newEmail,
+            'phone': newPhoneNumber,
+          });
+        }
+      } catch (error) {
+        // Handle error while saving changes
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to save changes.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -77,14 +131,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: _nameController,
+              controller: _firstNameController,
               decoration: InputDecoration(
-                labelText: 'Name',
+                labelText: 'First Name',
+              ),
+            ),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(
+                labelText: 'Last Name',
               ),
             ),
             SizedBox(height: 10.0),
             TextField(
               controller: _emailController,
+              enabled: false,
               decoration: InputDecoration(
                 labelText: 'Email',
               ),
@@ -108,13 +169,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                  ), child: const Text('Save Changes', 
-                  style: TextStyle(
-                                    fontFamily: 'RobotoMono',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    ),),
+                  ),
+                  child: const Text(
+                    'Save Changes',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
