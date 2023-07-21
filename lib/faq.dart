@@ -13,8 +13,14 @@ class FAQ {
 
   FAQ({required this.question, required this.answer});
 }
+class faq extends StatefulWidget {
+  @override
+  _FaqState createState() => _FaqState();
+}
 
-class faq extends StatelessWidget {
+class _FaqState extends State<faq> {
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,54 +33,87 @@ class faq extends StatelessWidget {
       ),
       body: Container(
         height: double.infinity,
-        child: FirebaseAnimatedList(
-          query: FirebaseDatabase.instance.ref().child('faqs'),
-          itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation<double> animation, int index) {
-            final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
-
-            if (data != null) {
-              final faq = FAQ(
-                question: data['question'] as String,
-                answer: data['answer'] as String,
-              );
-              return Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Color.fromRGBO(116, 85, 247, 0.1),
-                ),
-                child: ExpansionTile(
-                  title: Text(
-                    faq.question,
-                    style: TextStyle(
-                      fontFamily: 'RobotoMono',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search questions...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 6),
-                      child: Text(
-                        faq.answer,
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontStyle: FontStyle.italic,
-                          fontSize: 16,
-                          color: Color.fromRGBO(131, 136, 139, 1),
+                ),
+              ),
+            ),
+            Expanded(
+              child: FirebaseAnimatedList(
+                query: FirebaseDatabase.instance.ref().child('faqs'),
+                itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation<double> animation, int index) {
+                  final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
+
+                  if (data != null) {
+                    final faq = FAQ(
+                      question: data['question'] as String,
+                      answer: data['answer'] as String,
+                    );
+
+                    if (_searchQuery.isEmpty ||
+                        faq.question.toLowerCase().contains(_searchQuery.toLowerCase())) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Color.fromRGBO(116, 85, 247, 0.1),
+                  ),
+                  child: ExpansionTile(
+                    title: Text(
+                      faq.question,
+                      style: TextStyle(
+                        fontFamily: 'RobotoMono',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.left, // Align the question text to the left
+                    ),
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft, // Align the answer text to the left
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          child: Text(
+                            faq.answer,
+                            textAlign: TextAlign.left, // Align the answer text to the left
+                            style: TextStyle(
+                              fontFamily: 'RobotoMono',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 16,
+                              color: Color.fromRGBO(131, 136, 139, 1),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            }
+                      );
+                    }
+                  }
 
-            // Return an empty container if data is null or not in the expected format
-            return Container();
-          },
+                  // Return an empty container if data is null, not in the expected format, or not matching the search query
+                  return Container();
+                },
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

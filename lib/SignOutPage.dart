@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'LoginScreen.dart';
+import 'OptionScreen.dart';
 
 class SignOutPage extends StatelessWidget {
   @override
@@ -47,7 +47,7 @@ class SignOutPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
+              MaterialPageRoute(builder: (context) => OptionScreen()),
             );
                   },
                   child: Text('Sign Out'),
@@ -82,4 +82,3 @@ class SignOutPage extends StatelessWidget {
     );
   }
 }
-
