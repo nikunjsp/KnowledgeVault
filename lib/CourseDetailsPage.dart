@@ -1,226 +1,281 @@
 import 'package:flutter/material.dart';
-import 'widgets/CourseVideos.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CourseDetailsPage extends StatefulWidget {
+  final Map<String, dynamic> arguments;
 
-  //const CourseDetailsPage(String picture, {Key? key}) : super(key: key);
-  late String coursename;
-  late String duration;
-  CourseDetailsPage(this.coursename, this.duration);
+  CourseDetailsPage({required this.arguments});
 
   @override
-  State<CourseDetailsPage> createState() => _CourseDetailsPageState(); 
-
+  _CourseDetailsPageState createState() => _CourseDetailsPageState();
 }
 
 class _CourseDetailsPageState extends State<CourseDetailsPage> {
+  final double fontSize = 0.04;
+  final double paddingVertical = 0.03;
+  final double paddingHorizontal = 0.05;
+  late String coursename;
+  late String duration;
+  late String description;
+  late String video;
 
-  late final CourseVideos coursevideo;
-  
+  bool isEnrolled = false;
+  late YoutubePlayerController _youtubeController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Extract the necessary data from the arguments
+    coursename = widget.arguments['coursename'];
+    duration = widget.arguments['duration'];
+    description = widget.arguments['description'];
+    video = widget.arguments['video'];
+
+    // Initialize the YouTube player controller with try-catch block
+    try {
+      _youtubeController = YoutubePlayerController(
+        initialVideoId: YoutubePlayer.convertUrlToId(video)!,
+        flags: const YoutubePlayerFlags(
+          autoPlay: true,
+          mute: false,
+          disableDragSeek: true,
+        ),
+      );
+    } catch (e) {
+      print('Error initializing YouTube player: $e');
+      // Handle the error gracefully, for example, you can show an error message to the user.
+    }
+  }
+
+  void handleEnrollButton() {
+    setState(() {
+      isEnrolled = true;
+    });
+  }
+
+  Widget buildVideoPlayer() {
+    if (isEnrolled) {
+      return YoutubePlayer(
+        controller: _youtubeController,
+        showVideoProgressIndicator: true,
+        progressIndicatorColor:
+            Colors.amber, // You can change the progress indicator color here
+        progressColors: ProgressBarColors(
+          playedColor: Colors.amber,
+          handleColor: Colors.amberAccent,
+        ),
+        onReady: () {
+          // The controller is ready for method calls
+          _youtubeController
+              .play(); // Play the video when the controller is ready
+        },
+      );
+    } else {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: double.infinity,
+            height:
+                MediaQuery.of(context).size.width * 0.5625, // 16:9 aspect ratio
+            color: Colors.grey,
+          ),
+          IconButton(
+            icon: Icon(Icons.lock),
+            color: Colors.white,
+            iconSize: 50,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Enrollment Status'),
+                    content: Text('You should enroll in this course.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _youtubeController.dispose(); // Dispose the controller properly
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-
-   return Scaffold(
-    appBar: AppBar(
-      foregroundColor: Colors.black,
-      backgroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-      title: Text(widget.coursename),
-    
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 20),
-          child: Row(
-                    children: [
-                      Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Icon(
-                          Icons.business_center,
-                          size : 20,
-                          color: Color.fromRGBO(116, 85, 247, 1),
-                        ),
-                        Text(
-                          "1000", 
-                          style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontStyle: FontStyle.normal,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color.fromRGBO(116, 85, 247, 1),
-                        ),
-                       ),
-                      ],
-                   ),
-                  ]
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          coursename,
+          style:
+              TextStyle(fontSize: MediaQuery.of(context).size.width * fontSize),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildVideoPlayer(),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * paddingVertical,
+                horizontal:
+                    MediaQuery.of(context).size.width * paddingHorizontal,
               ),
-            ],
-          ),
-
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: ListView(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  width: MediaQuery.of(context).size.width,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromRGBO(246, 245, 251, 1),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                      height:
+                          MediaQuery.of(context).size.height * paddingVertical),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height *
+                          paddingVertical *
+                          0.5,
+                    ),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                          MediaQuery.of(context).size.width * 0.04),
+                      color: Color.fromRGBO(116, 85, 247, 1),
+                    ),
+                    child: Text(
+                      "Courses Details",
+                      style: TextStyle(
+                        fontFamily: 'RobotoMono',
+                        fontStyle: FontStyle.normal,
+                        fontSize:
+                            MediaQuery.of(context).size.width * fontSize * 0.8,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  child: const Icon(
-                          Icons.play_circle_fill_rounded,
-                          size : 50,
-                          color: Color.fromRGBO(116, 85, 247, 1),
-                  ),
-                ),
-                const SizedBox(height : 20),
-
-                Row(
+                  SizedBox(
+                      height: MediaQuery.of(context).size.height *
+                          paddingVertical *
+                          1.2),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text( 
-                      "${widget.coursename} Complete Course",
-                      style: const TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20,
-                          color: Colors.black,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  coursename,
+                                  style: TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            fontSize *
+                                            1.2,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.1),
+                                Text(
+                                  duration,
+                                  style: TextStyle(
+                                    fontFamily: 'RobotoMono',
+                                    fontStyle: FontStyle.normal,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            fontSize *
+                                            0.8,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(131, 136, 139, 1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                                height: MediaQuery.of(context).size.width *
+                                    fontSize *
+                                    0.3),
+                            Text(
+                              description,
+                              style: TextStyle(
+                                fontFamily: 'RobotoMono',
+                                fontStyle: FontStyle.normal,
+                                fontSize: MediaQuery.of(context).size.width *
+                                    fontSize *
+                                    0.6,
+                                fontWeight: FontWeight.w500,
+                                color: Color.fromRGBO(131, 136, 139, 1),
+                              ),
+                            ),
+                            SizedBox(
+                                height: MediaQuery.of(context).size.height *
+                                    paddingVertical *
+                                    1.5),
+                          ],
                         ),
                       ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const Icon(
-                        Icons.timer,
-                        size : 18,
-                        color: Color.fromRGBO(131, 136, 139, 1),
-                      ),
-                      Text(
-                        '${widget.duration}', 
-                        style: const TextStyle(
-                            fontFamily: 'RobotoMono',
-                            fontStyle: FontStyle.normal,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color.fromRGBO(131, 136, 139, 1),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height : 5),
-
-                const Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                  style: TextStyle(
-                    fontFamily: 'RobotoMono',
-                    fontStyle: FontStyle.italic,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(131, 136, 139, 1),
+                    ],
                   ),
-                ),
-
-                const SizedBox(height: 25,),
-                
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: isEnrolled
+          ? null
+          : Padding(
+              padding: EdgeInsets.symmetric(
+                vertical:
+                    MediaQuery.of(context).size.height * paddingVertical * 0.5,
+                horizontal:
+                    MediaQuery.of(context).size.width * paddingHorizontal * 0.5,
+              ),
+              child: GestureDetector(
+                onTap: handleEnrollButton,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.07,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(116, 85, 247, 1),
+                    borderRadius: BorderRadius.circular(
+                        MediaQuery.of(context).size.width * fontSize * 0.5),
+                    color: Color(0xFF674AEF),
                   ),
-                  child: const Text(
-                          "Courses Details",
-                          style: TextStyle(
-                            fontFamily: 'RobotoMono',
-                            fontStyle: FontStyle.normal,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
+                  child: Text(
+                    'Enroll Course',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontSize:
+                          MediaQuery.of(context).size.width * fontSize * 0.8,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-
-                const SizedBox(height: 20),
-
-                ListView.builder(
-                  itemCount: coursevideolist.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(), 
-                  itemBuilder: (BuildContext context, int index) {  
-                    return ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: index == 0 ? const Color(0xFF674AEF) : const Color(0xFF674AEF).withOpacity(0.5) ,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.play_arrow_rounded,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                      ),
-                      title: Text(
-                        coursevideolist[index].name,
-                        style: const TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      subtitle: Text(
-                        coursevideolist[index].duration,
-                        style: const TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12,
-                          color: Color.fromRGBO(131, 136, 139, 1),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
-          bottomSheet: BottomSheet(
-              onClosing: () {},
-              backgroundColor: Colors.white,
-              enableDrag: false,
-              builder: (context) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                      height: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color(0xFF674AEF),
-                      ),
-                      
-                      child: const Text(
-                          'Enroll Course',
-                          style: TextStyle(
-                              fontFamily: 'RobotoMono',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      );
-                    },
-            ),
-        );
-    }
+    );
+  }
 }
