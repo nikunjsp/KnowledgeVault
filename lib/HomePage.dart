@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   final DatabaseReference _courseRef =
       FirebaseDatabase.instance.ref().child('Course');
   List<Courses> courselist = [];
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -34,10 +35,8 @@ class _HomePageState extends State<HomePage> {
       if (snapshot.value != null && snapshot.value is Map<dynamic, dynamic>) {
         Map<dynamic, dynamic> dataList =
             snapshot.value as Map<dynamic, dynamic>;
-        print('Retrieved data: $dataList');
 
         List<Courses> fetchedcourses = [];
-
         dataList.forEach((key, value) {
           Courses course = Courses.fromMap(value);
           fetchedcourses.add(course);
@@ -60,75 +59,58 @@ class _HomePageState extends State<HomePage> {
       appBar: const Bar(),
       body: Container(
         height: double.infinity,
-        child: ListView(
+        child: Column(
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 40),
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: const TextField(
-                cursorColor: Colors.grey,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
                 decoration: InputDecoration(
-                  fillColor: Color.fromRGBO(246, 245, 251, 1),
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
                   hintText: 'Search your topic',
-                  hintStyle: TextStyle(
-                      color: Color.fromRGBO(131, 136, 139, 1), fontSize: 12),
                   prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 20, bottom: 50, left: 25, right: 25),
-              child: Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Courses",
-                        style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ListView.builder(
-                    padding: EdgeInsets.zero,
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: courselist.length,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CourseDetailsPage(
-                                arguments: {
-                                  'coursename':
-                                      courselist[index].coursename ?? '',
-                                  'duration': courselist[index].duration ?? '',
-                                  'description':
-                                      courselist[index].description ?? '',
-                                  'thumbnail':
-                                      courselist[index].thumbnail ?? '',
-                                  'video': courselist[index].video ?? '',
-                                },
-                              ),
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: courselist.length,
+                itemBuilder: (context, index) {
+                  final course = courselist[index];
+
+                  if (_searchQuery.isEmpty ||
+                      course.coursename!
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase()) ||
+                      course.description!
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase())) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CourseDetailsPage(
+                              arguments: {
+                                'coursename': course.coursename ?? '',
+                                'duration': course.duration ?? '',
+                                'description': course.description ?? '',
+                                'thumbnail': course.thumbnail ?? '',
+                                'video': course.video ?? '',
+                              },
                             ),
-                          );
-                        },
+                          ),
+                        );
+                      },
                         child: Padding(
                           padding: const EdgeInsets.only(
                               bottom: 20, left: 10, right: 10),
@@ -246,10 +228,11 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
               ),
             ),
           ],
