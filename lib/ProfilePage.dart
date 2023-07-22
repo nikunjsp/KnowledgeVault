@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:knowledgevault/SettingsPage.dart';
 import 'EditProfilePage.dart';
 import 'ResetPasswordPage.dart';
 
@@ -79,7 +80,6 @@ void _fetchUserData() async {
       ),
     );
 
-    // Handle the result if needed
   }
 
   @override
@@ -96,7 +96,12 @@ void _fetchUserData() async {
           icon: Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SettingsPage(),
+      ),
+    );
           },
         ),
       ),

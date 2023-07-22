@@ -22,6 +22,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your new password';
+    }
+
+    // Ensuring the password contains at least one uppercase letter, one lowercase letter, and one digit
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+      return 'Password must be at least 6 characters and contain at least\none uppercase letter, one lowercase letter, and one digit';
+    }
+    return null;
+  }
+
   void _resetPassword() async {
     String existingPassword = _existingPasswordController.text;
     String newPassword = _newPasswordController.text;
@@ -38,6 +50,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     }
 
+    String? newPasswordError = _validatePassword(newPassword);
+    if (newPasswordError != null) {
+      _showSnackBar(newPasswordError);
+      return;
+    }
+
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
@@ -48,12 +66,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
         _showSnackBar('Password reset successful.');
 
-        // Optionally, you can update the password in the database
+      
         String uid = user.uid;
         DatabaseReference userRef = _userRef.child(uid);
         await userRef.update({'password': newPassword});
 
-        // Clear the text fields
+      
         _existingPasswordController.clear();
         _newPasswordController.clear();
         _confirmPasswordController.clear();

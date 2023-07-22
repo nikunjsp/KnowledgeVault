@@ -25,6 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
+  final _formKey = GlobalKey<FormState>();
 
   DatabaseReference _userRef = FirebaseDatabase.instance.reference().child('Users');
 
@@ -46,7 +47,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+  String? _validateFirstName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your first name';
+    }
+    return null;
+  }
+
+  String? _validateLastName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your last name';
+    }
+    return null;
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your phone number';
+    }
+
+    if (value.length != 10) {
+      return 'Invalid phone number';
+    }
+    return null;
+  }
+
   void _saveChanges() async {
+    if (_formKey.currentState?.validate() == false) {
+      return;
+    }
+
     String newFirstName = _firstNameController.text;
     String newLastName = _lastNameController.text;
     String newEmail = _emailController.text;
@@ -127,62 +157,71 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _firstNameController,
-              decoration: InputDecoration(
-                labelText: 'First Name',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _firstNameController,
+                decoration: InputDecoration(
+                  labelText: 'First Name',
+                ),
+                // Add validation for first name
+                validator: _validateFirstName,
               ),
-            ),
-            TextField(
-              controller: _lastNameController,
-              decoration: InputDecoration(
-                labelText: 'Last Name',
+              TextFormField(
+                controller: _lastNameController,
+                decoration: InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                // Add validation for last name
+                validator: _validateLastName,
               ),
-            ),
-            SizedBox(height: 10.0),
-            TextField(
-              controller: _emailController,
-              enabled: false,
-              decoration: InputDecoration(
-                labelText: 'Email',
+              SizedBox(height: 10.0),
+              TextFormField(
+                controller: _emailController,
+                enabled: false,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                ),
               ),
-            ),
-            SizedBox(height: 10.0),
-            TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
+              SizedBox(height: 10.0),
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                ),
+                // Add validation for phone number
+                validator: _validatePhoneNumber,
               ),
-            ),
-            SizedBox(height: 20.0),
-            Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: ElevatedButton(
-                  onPressed: _saveChanges,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
-                    padding: EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 20.0),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: ElevatedButton(
+                    onPressed: _saveChanges,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
+                      padding: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Save Changes',
-                    style: TextStyle(
-                      fontFamily: 'RobotoMono',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Colors.black,
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(
+                        fontFamily: 'RobotoMono',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
