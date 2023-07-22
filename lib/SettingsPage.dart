@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:knowledgevault/HomePage.dart';
 import 'ProfilePage.dart';
 import 'PrivacyPolicyPage.dart';
 import 'AboutPage.dart';
@@ -17,7 +18,12 @@ class SettingsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
           },
         ),
         title: const Text(
@@ -39,8 +45,6 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Handle profile button tap
-                // Add your logic here
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -52,7 +56,6 @@ class SettingsPage extends StatelessWidget {
                 
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  // side: BorderSide(color: Color.fromRGBO(246, 245, 251, 1),
                 ),
               ),
               
@@ -79,8 +82,6 @@ class SettingsPage extends StatelessWidget {
             
             ElevatedButton(
               onPressed: () {
-                // Handle privacy policy button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
@@ -115,8 +116,6 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Handle about section button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AboutPage()),
@@ -151,8 +150,6 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Handle sign out button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SignOutPage()),
