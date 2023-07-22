@@ -97,6 +97,49 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _resetPassword() async {
+    String email = _emailController.text.trim();
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Email Sent'),
+            content: Text('A password reset email has been sent to $email.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Failed'),
+            content: Text('Failed to send password reset email. Please check your email address.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +214,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: _goToSignupScreen,
                     child: Text(
                       'Sign up',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.deepPurpleAccent,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextButton(
+                    onPressed: _resetPassword,
+                    child: Text(
+                      'Forgot Password?',
                       style: TextStyle(
                         fontSize: 15.0,
                         color: Colors.deepPurpleAccent,
