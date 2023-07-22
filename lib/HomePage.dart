@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:knowledgevault/CourseDetailsPage.dart';
+import 'CoursePlayer.dart';
 import 'AppBar.dart';
 import 'myrewards.dart';
 import 'marketplace.dart';
@@ -21,6 +23,11 @@ class _HomePageState extends State<HomePage> {
       FirebaseDatabase.instance.ref().child('Course');
   List<Courses> courselist = [];
 
+  final DatabaseReference _userRef =
+      FirebaseDatabase.instance.ref().child('Users');
+  List<dynamic> enrolledCourse = [];
+  bool isEnrolled = false;
+
   @override
   void initState() {
     super.initState();
@@ -29,29 +36,52 @@ class _HomePageState extends State<HomePage> {
 
   void fetchData() async {
     try {
-      DatabaseEvent event = await _courseRef.once();
-      DataSnapshot snapshot = event.snapshot;
-      if (snapshot.value != null && snapshot.value is Map<dynamic, dynamic>) {
-        Map<dynamic, dynamic> dataList =
-            snapshot.value as Map<dynamic, dynamic>;
-        print('Retrieved data: $dataList');
+      User? user = FirebaseAuth.instance.currentUser;
 
-        List<Courses> fetchedcourses = [];
+      if (user != null) {
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.ref().child('Users');
 
-        dataList.forEach((key, value) {
-          Courses course = Courses.fromMap(value);
-          fetchedcourses.add(course);
-        });
+        Query query = userRef.orderByChild('email').equalTo(user.email);
 
-        setState(() {
-          courselist = fetchedcourses;
-        });
-      } else {
-        print('Invalid data format: ${snapshot.value}');
+        DataSnapshot snapshot2 = (await query.once()).snapshot;
+        Map<dynamic, dynamic>? userData =
+            snapshot2.value as Map<dynamic, dynamic>?;
+
+        if (userData != null) {
+          Map<dynamic, dynamic> userRecord = userData.values.first;
+
+          List<dynamic> userCourses = userRecord['userCourses'];
+          DatabaseEvent event = await _courseRef.once();
+          DataSnapshot snapshot = event.snapshot;
+
+          if (snapshot.value != null &&
+              snapshot.value is Map<dynamic, dynamic>) {
+            Map<dynamic, dynamic> dataList =
+                snapshot.value as Map<dynamic, dynamic>;
+            List<Courses> fetchedcourses = [];
+
+            dataList.forEach((key, value) {
+              Courses course = Courses.fromMap(value);
+              fetchedcourses.add(course);
+            });
+
+            setState(() {
+              courselist = fetchedcourses;
+              enrolledCourse = userCourses;
+            });
+          }
+        }
       }
     } catch (error) {
       print('Error fetching courses data: $error');
     }
+  }
+
+  void checkEnroll(int index) {
+    setState(() {
+      isEnrolled = enrolledCourse.contains(index);
+    });
   }
 
   @override
@@ -111,23 +141,43 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CourseDetailsPage(
-                                arguments: {
-                                  'coursename':
-                                      courselist[index].coursename ?? '',
-                                  'duration': courselist[index].duration ?? '',
-                                  'description':
-                                      courselist[index].description ?? '',
-                                  'thumbnail':
-                                      courselist[index].thumbnail ?? '',
-                                  'video': courselist[index].video ?? '',
-                                },
-                              ),
-                            ),
-                          );
+                          checkEnroll(index);
+                          isEnrolled
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CoursePlayer(
+                                      arguments: {
+                                        'coursename':
+                                            courselist[index].coursename ?? '',
+                                        'duration':
+                                            courselist[index].duration ?? '',
+                                        'description':
+                                            courselist[index].description ?? '',
+                                        'thumbnail':
+                                            courselist[index].thumbnail ?? '',
+                                        'video': courselist[index].video ?? '',
+                                      },
+                                    ),
+                                  ),
+                                )
+                              : Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        CourseDetailsPage(arguments: {
+                                      'coursename':
+                                          courselist[index].coursename ?? '',
+                                      'duration':
+                                          courselist[index].duration ?? '',
+                                      'description':
+                                          courselist[index].description ?? '',
+                                      'thumbnail':
+                                          courselist[index].thumbnail ?? '',
+                                      'video': courselist[index].video ?? '',
+                                    }, enrolledCourseKey: index),
+                                  ),
+                                );
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(
@@ -233,9 +283,7 @@ class _HomePageState extends State<HomePage> {
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            const SizedBox(
-                                                height:
-                                                    10), // Adjust the value for desired spacing
+                                            const SizedBox(height: 10),
                                           ],
                                         ),
                                       ),
@@ -297,7 +345,6 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(builder: (context) => const marketplace()),
             );
           } else if (index == 2) {
-            // No action needed
           } else if (index == 3) {
             Navigator.push(
               context,
@@ -332,11 +379,11 @@ class Courses {
 
   factory Courses.fromMap(Map<dynamic, dynamic> map) {
     return Courses(
-      coursename: map['coursename'],
-      description: map['description'],
-      duration: map['duration'],
-      thumbnail: map['thumbnail'],
-      video: map['video'],
+      coursename: map['coursename'] ?? '',
+      description: map['description'] ?? '',
+      duration: map['duration'] ?? '',
+      thumbnail: map['thumbnail'] ?? '',
+      video: map['video'] ?? '',
     );
   }
 }

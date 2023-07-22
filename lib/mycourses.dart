@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:knowledgevault/CourseDetailsPage.dart';
+import 'package:knowledgevault/CoursePlayer.dart';
 import 'HomePage.dart';
 import 'myrewards.dart';
 import 'marketplace.dart';
@@ -41,34 +41,20 @@ class _mycoursesState extends State<mycourses> {
             snapshot2.value as Map<dynamic, dynamic>?;
 
         if (userData != null) {
-          print(userData);
           Map<dynamic, dynamic> userRecord = userData.values.first;
 
-          print(userRecord);
-
           if (userRecord.containsKey('userCourses')) {
-            print('------------');
             List<dynamic> userCourses = userRecord['userCourses'];
             Query query1 = courseRef.orderByChild('index');
             DataSnapshot snapshot = (await query1.once()).snapshot;
 
-            print('.............');
-
             if (snapshot.value != null &&
                 snapshot.value is Map<dynamic, dynamic>) {
-              print('inside iffffffff');
-
-              print('here');
-
               Map<dynamic, dynamic> dataList =
                   snapshot.value as Map<dynamic, dynamic>;
               List<Courses> fetchedmyCourses = [];
 
-              print(dataList);
-
               userCourses.forEach((courseIndex) {
-                print('inside for loop');
-                print(courseIndex);
                 if (dataList.containsKey(courseIndex.toString())) {
                   Courses course =
                       Courses.fromMap(dataList[courseIndex.toString()]);
@@ -79,9 +65,6 @@ class _mycoursesState extends State<mycourses> {
               setState(() {
                 mycourselist = fetchedmyCourses;
               });
-
-              print('==============');
-              print(mycourselist);
             }
           } else {
             print('userCourses field not found in userRecord');
@@ -136,7 +119,7 @@ class _mycoursesState extends State<mycourses> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => CourseDetailsPage(
+                              builder: (context) => CoursePlayer(
                                 arguments: {
                                   'coursename':
                                       mycourselist[index].coursename ?? '',
@@ -256,9 +239,7 @@ class _mycoursesState extends State<mycourses> {
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            const SizedBox(
-                                                height:
-                                                    10), // Adjust the value for desired spacing
+                                            const SizedBox(height: 10),
                                           ],
                                         ),
                                       ),
