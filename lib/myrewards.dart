@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'HomePage.dart';
-import 'models/Rewards.dart';
 import 'marketplace.dart';
 import 'mycourses.dart';
 import 'faq.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class myrewards extends StatefulWidget {
   const myrewards({Key? key}) : super(key: key);
@@ -13,6 +14,72 @@ class myrewards extends StatefulWidget {
 }
 
 class _myrewardsState extends State<myrewards> {
+  final double fontSize = 0.04;
+  final double paddingVertical = 0.03;
+  final double paddingHorizontal = 0.05;
+
+  final DatabaseReference _myrewardsRef =
+      FirebaseDatabase.instance.reference().child('Users');
+  List<Reward> myrewardList = [];
+  String userPoints = '';
+  var userReward = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.ref().child('Users');
+        DatabaseReference rewardRef =
+            FirebaseDatabase.instance.ref().child('RewardList');
+
+        Query query = userRef.orderByChild('email').equalTo(user.email);
+
+        DataSnapshot snapshot2 = (await query.once()).snapshot;
+        Map<dynamic, dynamic>? userData =
+            snapshot2.value as Map<dynamic, dynamic>?;
+
+        if (userData != null) {
+          Map<dynamic, dynamic> userRecord = userData.values.first;
+
+          if (userRecord.containsKey('userRewards')) {
+            List<dynamic> userRewards = userRecord['userRewards'];
+            Query query1 = rewardRef.orderByChild('index');
+            DataSnapshot snapshot = (await query1.once()).snapshot;
+
+            if (snapshot.value != null &&
+                snapshot.value is Map<dynamic, dynamic>) {
+              Map<dynamic, dynamic> data =
+                  snapshot.value as Map<dynamic, dynamic>;
+              List<Reward> fetchedmyRewards = [];
+
+              userRewards.forEach((rewardIndex) {
+                if (data.containsKey(rewardIndex.toString())) {
+                  Reward reward = Reward.fromMap(data[rewardIndex.toString()]);
+                  fetchedmyRewards.add(reward);
+                }
+              });
+
+              setState(() {
+                myrewardList = fetchedmyRewards;
+                userPoints = userRecord['points'].toString();
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      print('Error fetching rewards data: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +88,7 @@ class _myrewardsState extends State<myrewards> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        // title: Text('Rewards'),
-        actions: const [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),
             child: Row(
@@ -36,7 +102,7 @@ class _myrewardsState extends State<myrewards> {
                       color: Color.fromRGBO(116, 85, 247, 1),
                     ),
                     Text(
-                      "1000",
+                      userPoints,
                       style: TextStyle(
                         fontFamily: 'RobotoMono',
                         fontStyle: FontStyle.normal,
@@ -59,19 +125,9 @@ class _myrewardsState extends State<myrewards> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'My Rewards',
-                  style: TextStyle(
-                    fontFamily: 'RobotoMono',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                const SizedBox(height: 20),
                 GridView.builder(
-                  itemCount: rewardlist.length,
+                  itemCount: myrewardList.length,
                   shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     childAspectRatio:
@@ -92,7 +148,7 @@ class _myrewardsState extends State<myrewards> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              rewardlist[index].rewardname,
+                              myrewardList[index].name ?? '',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.w600,
@@ -102,7 +158,9 @@ class _myrewardsState extends State<myrewards> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              rewardlist[index].description,
+                              myrewardList[index].description ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.justify,
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
@@ -115,24 +173,34 @@ class _myrewardsState extends State<myrewards> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Expired on 08/06/2023',
+                                Text(
+                                  'Price: ${myrewardList[index].points}',
                                   style: TextStyle(
                                     fontFamily: 'RobotoMono',
                                     fontStyle: FontStyle.normal,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(131, 136, 139, 1),
+                                    color: Color.fromRGBO(0, 0, 0, 1),
                                   ),
                                 ),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    foregroundColor: Colors.white,
-                                    textStyle: const TextStyle(fontSize: 12),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.blue,
                                   ),
-                                  onPressed: () {},
-                                  child: const Text('Redeemed'),
+                                  child: TextButton(
+                                    onPressed: null,
+                                    child: const Text(
+                                      'Redeemed',
+                                      style: TextStyle(
+                                        fontFamily: 'RobotoMono',
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -182,7 +250,6 @@ class _myrewardsState extends State<myrewards> {
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
             );
-            // No action needed
           } else if (index == 3) {
             Navigator.push(
               context,
@@ -191,7 +258,7 @@ class _myrewardsState extends State<myrewards> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  faq()),
+              MaterialPageRoute(builder: (context) => faq()),
             );
           }
         },

@@ -1,17 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:knowledgevault/myrewards.dart';
-import 'models/Rewards.dart';
 import 'models/redeemReward.dart';
-import 'package:knowledgevault/myrewards.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class redeemItem extends StatefulWidget {
-  const redeemItem({Key? key});
+  late final String name;
+  late final String picture;
+  late final String description;
+  late final int points;
+  late final int redeemRewardKey;
+
+  redeemItem({
+    required this.name,
+    required this.description,
+    required this.points,
+    required this.picture,
+    required this.redeemRewardKey,
+  });
 
   @override
   State<redeemItem> createState() => _redeemItemState();
 }
 
 class _redeemItemState extends State<redeemItem> {
+  String userPoints = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('Users');
+      Query query = userRef.orderByChild('email').equalTo(user.email);
+
+      DataSnapshot snapshot2 = (await query.once()).snapshot;
+      Map<dynamic, dynamic>? userData =
+          snapshot2.value as Map<dynamic, dynamic>?;
+
+      if (userData != null) {
+        Map<dynamic, dynamic> userRecord = userData.values.first;
+
+        setState(() {
+          userPoints = userRecord['points'].toString();
+        });
+      }
+    }
+  }
+
+  void updatePoints(updatedUserPoints, redeemRewardKey) async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('Users');
+      Query query = userRef.orderByChild('email').equalTo(user.email);
+
+      DataSnapshot snapshot = (await query.once()).snapshot;
+      Map<dynamic, dynamic>? userData =
+          snapshot.value as Map<dynamic, dynamic>?;
+
+      if (userData != null) {
+        String userId = userData.keys.first;
+        Map<dynamic, dynamic> userRecord = userData.values.first;
+
+        List<dynamic> userRewards = userRecord['userRewards'] ?? [];
+        var rewardKey = widget.key;
+
+        // if (!userRewards.contains(redeemRewardKey)) {
+        userRewards.add(redeemRewardKey);
+        // }
+
+        userRef.child(userId).update({
+          'points': updatedUserPoints,
+          'userRewards': userRewards
+        }).then((_) {
+          setState(() {
+            userPoints = updatedUserPoints.toString();
+          });
+        }).catchError((error) {
+          print('Failed to update points: $error');
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +100,7 @@ class _redeemItemState extends State<redeemItem> {
         elevation: 0,
         centerTitle: true,
         title: const Text('Rewards'),
-        actions: const [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),
             child: Row(
@@ -35,7 +114,7 @@ class _redeemItemState extends State<redeemItem> {
                       color: Color.fromRGBO(116, 85, 247, 1),
                     ),
                     Text(
-                      "1000",
+                      userPoints,
                       style: TextStyle(
                         fontFamily: 'RobotoMono',
                         fontStyle: FontStyle.normal,
@@ -82,10 +161,11 @@ class _redeemItemState extends State<redeemItem> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(0),
-                              child: Image.asset(
-                                'assets/icons/${redeemRewardlist[index].picture}.jpg',
-                                width: 250,
-                                height: 300,
+                              child: Image.network(
+                                widget.picture,
+                                fit: BoxFit.cover,
+                                height: MediaQuery.of(context).size.width * 0.4,
+                                width: double.infinity,
                               ),
                             ),
                             const SizedBox(
@@ -95,7 +175,7 @@ class _redeemItemState extends State<redeemItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  redeemRewardlist[index].rewardname,
+                                  '${widget.name}',
                                   style: const TextStyle(
                                     fontFamily: 'RobotoMono',
                                     fontWeight: FontWeight.w600,
@@ -108,7 +188,7 @@ class _redeemItemState extends State<redeemItem> {
                             const SizedBox(height: 10),
                             Text(
                               textAlign: TextAlign.justify,
-                              redeemRewardlist[index].description,
+                              '${widget.description}',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
                                 fontStyle: FontStyle.italic,
@@ -127,12 +207,38 @@ class _redeemItemState extends State<redeemItem> {
                                   textStyle: const TextStyle(fontSize: 20),
                                 ),
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const myrewards()),
-                                  );
+                                  if (int.parse(userPoints) >= widget.points) {
+                                    int updatedUserPoints =
+                                        int.parse(userPoints) - widget.points;
+                                    int redeemRewardKey =
+                                        widget.redeemRewardKey;
+                                    updatePoints(
+                                        updatedUserPoints, redeemRewardKey);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const myrewards()),
+                                    );
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title:
+                                            const Text('Insufficient Points'),
+                                        content: const Text(
+                                            'You do not have enough points to redeem this reward.'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: const Text('Redeem Now'),
                               ),

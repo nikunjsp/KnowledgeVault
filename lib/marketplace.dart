@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-// import 'models/Reward.dart';
 import 'myrewards.dart';
 import 'mycourses.dart';
 import 'faq.dart';
 import 'package:knowledgevault/redeemItem.dart';
 import 'HomePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class marketplace extends StatefulWidget {
   const marketplace({super.key});
@@ -18,6 +18,7 @@ class _marketplaceState extends State<marketplace> {
   final DatabaseReference _rewardsRef =
       FirebaseDatabase.instance.reference().child('RewardList');
   List<Reward> rewardList = [];
+  String userPoints = '';
 
   @override
   void initState() {
@@ -31,18 +32,33 @@ class _marketplaceState extends State<marketplace> {
       DataSnapshot snapshot = event.snapshot;
       if (snapshot.value != null && snapshot.value is Map<dynamic, dynamic>) {
         Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
-        print('Retrieved data: $data');
-        // print('Retrieved data: ${data.runtimeType}');
+
         List<Reward> fetchedRewards = [];
         data.forEach((key, value) {
           Reward reward = Reward.fromMap(value);
           fetchedRewards.add(reward);
         });
 
-        setState(() {
-          rewardList =
-              fetchedRewards; // Update the rewardList with the fetched rewards
-        });
+        User? user = FirebaseAuth.instance.currentUser;
+
+        if (user != null) {
+          DatabaseReference userRef =
+              FirebaseDatabase.instance.ref().child('Users');
+          Query query = userRef.orderByChild('email').equalTo(user.email);
+
+          DataSnapshot snapshot2 = (await query.once()).snapshot;
+          Map<dynamic, dynamic>? userData =
+              snapshot2.value as Map<dynamic, dynamic>?;
+
+          if (userData != null) {
+            Map<dynamic, dynamic> userRecord = userData.values.first;
+
+            setState(() {
+              rewardList = fetchedRewards;
+              userPoints = userRecord['points'].toString();
+            });
+          }
+        }
       }
     } catch (error) {
       print('Error fetching rewards data: $error');
@@ -58,7 +74,7 @@ class _marketplaceState extends State<marketplace> {
         elevation: 0,
         centerTitle: true,
         title: Text('Rewards'),
-        actions: const [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),
             child: Row(
@@ -72,7 +88,7 @@ class _marketplaceState extends State<marketplace> {
                       color: Color.fromRGBO(116, 85, 247, 1),
                     ),
                     Text(
-                      "1000",
+                      userPoints,
                       style: TextStyle(
                         fontFamily: 'RobotoMono',
                         fontStyle: FontStyle.normal,
@@ -98,7 +114,6 @@ class _marketplaceState extends State<marketplace> {
                 GridView.builder(
                   itemCount: rewardList.length,
                   shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     childAspectRatio:
@@ -130,8 +145,7 @@ class _marketplaceState extends State<marketplace> {
                             const SizedBox(height: 10),
                             Text(
                               rewardList[index].description ?? '',
-                              maxLines:
-                                  1, // Specify the maximum number of lines to show
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.justify,
                               style: const TextStyle(
@@ -146,8 +160,6 @@ class _marketplaceState extends State<marketplace> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  // 'price:100',
-                                  // 'Price:' + rewardList[index].points.toString(),
                                   'Price: ${rewardList[index].points}',
                                   style: TextStyle(
                                     fontFamily: 'RobotoMono',
@@ -164,13 +176,6 @@ class _marketplaceState extends State<marketplace> {
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
                                   onPressed: () {
-                                    print('Name: ${rewardList[index].name}');
-                                    print(
-                                        'Description: ${rewardList[index].description}');
-                                    print(
-                                        'Points: ${rewardList[index].points}');
-                                    print(
-                                        'picture: ${rewardList[index].picture}');
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -187,6 +192,7 @@ class _marketplaceState extends State<marketplace> {
                                                   points: rewardList[index]
                                                           .points ??
                                                       0,
+                                                  redeemRewardKey: index,
                                                 )));
                                   },
                                   child: const Text('Redeem Now'),
@@ -239,8 +245,6 @@ class _marketplaceState extends State<marketplace> {
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
             );
-
-            // No action needed
           } else if (index == 3) {
             Navigator.push(
               context,
@@ -249,7 +253,7 @@ class _marketplaceState extends State<marketplace> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const faq()),
+              MaterialPageRoute(builder: (context) => faq()),
             );
           }
         },
@@ -264,14 +268,19 @@ class Reward {
   int? points;
   String? picture;
 
-  Reward({this.description, this.name, this.points, this.picture});
+  Reward({
+    this.description,
+    this.name,
+    this.points,
+    this.picture,
+  });
 
   factory Reward.fromMap(Map<dynamic, dynamic> map) {
     return Reward(
-      name: map['name'],
-      description: map['description'],
-      points: map['points'],
-      picture: map['picture'],
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      points: map['points'] ?? '',
+      picture: map['picture'] ?? '',
     );
   }
 }
