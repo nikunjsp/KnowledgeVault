@@ -1,20 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'SignUpScreen.dart';
 import 'HomePage.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -26,6 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _togglePasswordVisibility() {
     setState(() {
@@ -61,17 +49,42 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState?.validate() == true) {
-      String email = _emailController.text;
+      String email = _emailController.text.trim();
       String password = _passwordController.text;
 
-      bool isLoggedIn = true;
-
-      if (isLoggedIn) {
+      try {
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        User? user = userCredential.user;
+        // Handle successful sign-in
+        print('Signed in successfully: ${user?.email}');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } catch (e) {
+        // Handle sign-in errors
+        print('Sign-in failed: $e');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Sign-in Failed'),
+              content: Text('Invalid email or password.'),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
       }
     }
@@ -101,17 +114,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                  margin: EdgeInsets.only(top: 135),
-                  child: TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(3.0),
+                    margin: EdgeInsets.only(top: 135),
+                    child: TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(3.0),
+                        ),
                       ),
+                      validator: _validateEmail,
                     ),
-                    validator: _validateEmail,
-                  ),),
+                  ),
                   SizedBox(height: 16.0),
                   TextFormField(
                     controller: _passwordController,

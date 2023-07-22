@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -10,6 +12,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
 
+  DatabaseReference _userRef = FirebaseDatabase.instance.reference().child('Users');
+
   @override
   void dispose() {
     _existingPasswordController.dispose();
@@ -18,26 +22,56 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
-  void _resetPassword() {
-    // Handle reset password button tap
-    // Add your logic here
+  void _resetPassword() async {
     String existingPassword = _existingPasswordController.text;
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmPasswordController.text;
 
     // Validate and process the passwords
     if (existingPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-      // Display an error message or show a snackbar indicating missing fields
+      _showSnackBar('Please fill in all the fields.');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      // Display an error message or show a snackbar indicating password mismatch
+      _showSnackBar('New password and confirm password do not match.');
       return;
     }
 
-    // Proceed with resetting the password
-    // Add your logic here
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        AuthCredential credential = EmailAuthProvider.credential(email: user.email!, password: existingPassword);
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+
+        _showSnackBar('Password reset successful.');
+
+        // Optionally, you can update the password in the database
+        String uid = user.uid;
+        DatabaseReference userRef = _userRef.child(uid);
+        await userRef.update({'password': newPassword});
+
+        // Clear the text fields
+        _existingPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+      } else {
+        _showSnackBar('User not found.');
+      }
+    } catch (e) {
+      _showSnackBar('Wrong existing password: Try again!');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -63,19 +97,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+            TextField(
               controller: _existingPasswordController,
               decoration: InputDecoration(labelText: 'Existing Password'),
               obscureText: true,
             ),
             SizedBox(height: 10),
-            TextFormField(
+            TextField(
               controller: _newPasswordController,
               decoration: InputDecoration(labelText: 'New Password'),
               obscureText: true,
             ),
             SizedBox(height: 10),
-            TextFormField(
+            TextField(
               controller: _confirmPasswordController,
               decoration: InputDecoration(labelText: 'Confirm Password'),
               obscureText: true,
@@ -92,13 +126,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                  ), child: const Text('Reset Password', 
-                  style: TextStyle(
-                                    fontFamily: 'RobotoMono',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    ),),
+                  ),
+                  child: const Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
