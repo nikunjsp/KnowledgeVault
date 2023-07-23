@@ -326,7 +326,36 @@ class _CoursePlayerState extends State<CoursePlayer> {
         ),
       ),
       bottomNavigationBar: isQuizTaken
-          ? null
+          ? Padding(
+              padding: EdgeInsets.symmetric(
+                vertical:
+                    MediaQuery.of(context).size.height * paddingVertical * 0.5,
+                horizontal:
+                    MediaQuery.of(context).size.width * paddingHorizontal * 0.5,
+              ),
+              child: GestureDetector(
+                onTap: null,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                        MediaQuery.of(context).size.width * fontSize * 0.5),
+                    color: Color(0xFF674AEF),
+                  ),
+                  child: Text(
+                    'Quiz Already attempted',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontSize:
+                          MediaQuery.of(context).size.width * fontSize * 1.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            )
           : Padding(
               padding: EdgeInsets.symmetric(
                 vertical:
@@ -349,7 +378,7 @@ class _CoursePlayerState extends State<CoursePlayer> {
                     style: TextStyle(
                       fontFamily: 'RobotoMono',
                       fontSize:
-                          MediaQuery.of(context).size.width * fontSize * 0.8,
+                          MediaQuery.of(context).size.width * fontSize * 1.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
