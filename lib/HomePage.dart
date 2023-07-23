@@ -50,7 +50,6 @@ class _HomePageState extends State<HomePage> {
 
         if (userData != null) {
           Map<dynamic, dynamic> userRecord = userData.values.first;
-
           List<dynamic> userCourses = userRecord['userCourses'];
           DatabaseEvent event = await _courseRef.once();
           DataSnapshot snapshot = event.snapshot;
@@ -142,23 +141,23 @@ class _HomePageState extends State<HomePage> {
                       return InkWell(
                         onTap: () {
                           checkEnroll(index);
+                          print(isEnrolled);
                           isEnrolled
                               ? Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CoursePlayer(
-                                      arguments: {
-                                        'coursename':
-                                            courselist[index].coursename ?? '',
-                                        'duration':
-                                            courselist[index].duration ?? '',
-                                        'description':
-                                            courselist[index].description ?? '',
-                                        'thumbnail':
-                                            courselist[index].thumbnail ?? '',
-                                        'video': courselist[index].video ?? '',
-                                      },
-                                    ),
+                                    builder: (context) =>
+                                        CoursePlayer(arguments: {
+                                      'coursename':
+                                          courselist[index].coursename ?? '',
+                                      'duration':
+                                          courselist[index].duration ?? '',
+                                      'description':
+                                          courselist[index].description ?? '',
+                                      'thumbnail':
+                                          courselist[index].thumbnail ?? '',
+                                      'video': courselist[index].video ?? '',
+                                    }, enrolledCourseKey: index),
                                   ),
                                 )
                               : Navigator.push(
