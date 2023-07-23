@@ -48,26 +48,6 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
     }
   }
 
-  void fetchData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      DatabaseReference userRef =
-          FirebaseDatabase.instance.ref().child('Users');
-      Query query = userRef.orderByChild('email').equalTo(user.email);
-
-      DataSnapshot snapshot2 = (await query.once()).snapshot;
-      Map<dynamic, dynamic>? userData =
-          snapshot2.value as Map<dynamic, dynamic>?;
-
-      if (userData != null) {
-        Map<dynamic, dynamic> userRecord = userData.values.first;
-
-        setState(() {});
-      }
-    }
-  }
-
   void updateUserCourses(enrolledCourseKey) async {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -84,26 +64,34 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
         String userId = userData.keys.first;
         Map<dynamic, dynamic> userRecord = userData.values.first;
 
-        List<dynamic> userCourses = userRecord['userCourses'] ?? [];
-        var courseKey = widget.key;
+        List<dynamic> userCourses = List.from(userRecord['userCourses'] ?? []);
+        var courseKey = widget.enrolledCourseKey;
 
         if (!userCourses.contains(enrolledCourseKey)) {
           userCourses.add(enrolledCourseKey);
         }
 
-        userRef.child(userId).update({'userCourses': userCourses}).then((_) {
-          setState(() {});
+        userRef.child(userId).update({
+          'userCourses': userCourses,
+        }).then((_) {
+          setState(() {
+            isEnrolled = true;
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const mycourses(),
+            ),
+          );
         }).catchError((error) {
-          print('Failed to update points: $error');
+          print('Failed to update courses: $error');
         });
       }
     }
   }
 
   void handleEnrollButton() {
-    setState(() {
-      isEnrolled = true;
-    });
+    updateUserCourses(widget.enrolledCourseKey);
   }
 
   Widget buildVideoPlayer() {
@@ -202,10 +190,11 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                           paddingVertical *
                           0.5,
                     ),
-                    decoration: BoxDecoration(color: Colors.indigo[50]),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo[50],
+                    ),
                     child: Text(
                       "   Course Details",
-                      textAlign: TextAlign.left,
                       style: TextStyle(
                         fontFamily: 'RobotoMono',
                         fontStyle: FontStyle.normal,
@@ -300,15 +289,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                     MediaQuery.of(context).size.width * paddingHorizontal * 0.5,
               ),
               child: GestureDetector(
-                onTap: () {
-                  updateUserCourses(widget.enrolledCourseKey);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const mycourses(),
-                    ),
-                  );
-                },
+                onTap: handleEnrollButton,
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.07,
                   alignment: Alignment.center,
