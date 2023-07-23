@@ -32,7 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-    if (!value.contains('@')) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
       return 'Invalid email';
     }
     return null;
@@ -43,8 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Please enter your password';
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (!RegExp(r'^(?=.[a-z])(?=.[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+      return 'Please enter valid password';
     }
     return null;
   }
@@ -95,6 +96,50 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MaterialPageRoute(builder: (context) => SignupScreen()),
     );
+  }
+
+  void _resetPassword() async {
+    String email = _emailController.text.trim();
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Email Sent'),
+            content: Text('A password reset email has been sent to $email.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Failed'),
+            content: Text(
+                'Failed to send password reset email. Please check your email address.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -171,6 +216,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: _goToSignupScreen,
                     child: Text(
                       'Sign up',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.deepPurpleAccent,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextButton(
+                    onPressed: _resetPassword,
+                    child: Text(
+                      'Forgot Password?',
                       style: TextStyle(
                         fontSize: 15.0,
                         color: Colors.deepPurpleAccent,
