@@ -17,6 +17,7 @@ class mycourses extends StatefulWidget {
 class _mycoursesState extends State<mycourses> {
   int _selectedIndex = 3;
   List<Courses> mycourselist = [];
+  List<int> courseIndexes = [];
 
   @override
   void initState() {
@@ -53,21 +54,22 @@ class _mycoursesState extends State<mycourses> {
               Map<dynamic, dynamic> dataList =
                   snapshot.value as Map<dynamic, dynamic>;
               List<Courses> fetchedmyCourses = [];
+              List<int> fetchedCourseIndexes = [];
 
               userCourses.forEach((courseIndex) {
                 if (dataList.containsKey(courseIndex.toString())) {
                   Courses course =
                       Courses.fromMap(dataList[courseIndex.toString()]);
                   fetchedmyCourses.add(course);
+                  fetchedCourseIndexes.add(courseIndex);
                 }
               });
 
               setState(() {
                 mycourselist = fetchedmyCourses;
+                courseIndexes = fetchedCourseIndexes;
               });
             }
-          } else {
-            print('userCourses field not found in userRecord');
           }
         }
       }
@@ -84,10 +86,10 @@ class _mycoursesState extends State<mycourses> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text('Courses'),
+        title: const Text('Courses'),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: 20),
             child: Row(
               children: [
                 Row(
@@ -131,6 +133,8 @@ class _mycoursesState extends State<mycourses> {
                                       mycourselist[index].thumbnail ?? '',
                                   'video': mycourselist[index].video ?? '',
                                 },
+                                enrolledCourseKey: courseIndexes[
+                                    index], // Use the fetched course index
                               ),
                             ),
                           );

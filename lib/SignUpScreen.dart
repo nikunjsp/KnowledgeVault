@@ -34,7 +34,7 @@ class _SignupScreenState extends State<SignupScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
   final DatabaseReference _userRef =
-  FirebaseDatabase.instance.reference().child('Users');
+      FirebaseDatabase.instance.reference().child('Users');
 
   @override
   void dispose() {
@@ -126,6 +126,10 @@ class _SignupScreenState extends State<SignupScreen> {
           'lastName': lastName,
           'phoneNumber': phoneNumber,
           'email': email,
+          'points': 100,
+          'userRewards': [],
+          'userCourses': [],
+          'quizTaken': [],
           // Add additional fields as needed
         };
 
@@ -230,7 +234,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                       child: Icon(
-                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                        _passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
                   ),
@@ -252,7 +258,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                       child: Icon(
-                        _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _confirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
                   ),

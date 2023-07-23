@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:knowledgevault/quizquestions.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class CoursePlayer extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
-  CoursePlayer({required this.arguments});
+  late final int enrolledCourseKey;
+
+  CoursePlayer({required this.arguments, required this.enrolledCourseKey});
 
   @override
   _CoursePlayerState createState() => _CoursePlayerState();
@@ -19,17 +24,20 @@ class _CoursePlayerState extends State<CoursePlayer> {
   late String description;
   late String video;
 
-  bool isEnrolled = false;
+  bool isQuizTaken = false;
   late YoutubePlayerController _youtubeController;
 
   @override
+  @override
   void initState() {
     super.initState();
+    // Extract the necessary data from the arguments
     coursename = widget.arguments['coursename'];
     duration = widget.arguments['duration'];
     description = widget.arguments['description'];
     video = widget.arguments['video'];
 
+    // Initialize the YouTube player controller with try-catch block
     try {
       _youtubeController = YoutubePlayerController(
         initialVideoId: YoutubePlayer.convertUrlToId(video)!,
@@ -41,13 +49,101 @@ class _CoursePlayerState extends State<CoursePlayer> {
       );
     } catch (e) {
       print('Error initializing YouTube player: $e');
+      // Handle the error gracefully, for example, you can show an error message to the user.
+    }
+
+    int? index = widget.enrolledCourseKey;
+    if (index != null) {
+      int courseIndex = index;
+      checkQuizStatus();
+    }
+  }
+
+  void checkQuizStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('Users');
+      Query query = userRef.orderByChild('email').equalTo(user.email);
+
+      DataSnapshot snapshot = (await query.once()).snapshot;
+      Map<dynamic, dynamic>? userData =
+          snapshot.value as Map<dynamic, dynamic>?;
+
+      if (userData != null) {
+        Map<dynamic, dynamic> userRecord = userData.values.first;
+        List<dynamic> quizTakenList = List.from(userRecord['quizTaken']);
+        int courseIndex = widget.enrolledCourseKey;
+
+        if (quizTakenList.contains(courseIndex)) {
+          isQuizTaken = true;
+        }
+
+        setState(() {});
+      }
+    }
+  }
+
+  void updateQuizStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('Users');
+      Query query = userRef.orderByChild('email').equalTo(user.email);
+
+      DataSnapshot snapshot = (await query.once()).snapshot;
+      Map<dynamic, dynamic>? userData =
+          snapshot.value as Map<dynamic, dynamic>?;
+
+      if (userData != null) {
+        String userId = userData.keys.first;
+        int courseIndex = widget.enrolledCourseKey;
+
+        Map<dynamic, dynamic> userRecord = userData.values.first;
+
+        List<dynamic> takenQuizzes = List.from(userRecord['quizTaken'] ?? []);
+
+        if (!takenQuizzes.contains(courseIndex)) {
+          takenQuizzes.add(courseIndex);
+
+          userRef.child(userId).update({
+            'quizTaken': takenQuizzes,
+          }).then((_) {
+            // Successfully updated the quizTakenMap
+            print('Quiz status updated successfully.');
+          }).catchError((error) {
+            print('Failed to update quiz status: $error');
+          });
+        }
+      }
+    }
+  }
+
+  Map<dynamic, dynamic> convertToMap(dynamic quizTakenData) {
+    if (quizTakenData is Map<dynamic, dynamic>) {
+      return quizTakenData;
+    } else if (quizTakenData is List<Object?>) {
+      Map<dynamic, dynamic> convertedMap = {};
+      for (int i = 0; i < quizTakenData.length; i++) {
+        convertedMap[i.toString()] = quizTakenData[i];
+      }
+      return convertedMap;
+    } else {
+      return {};
     }
   }
 
   void handleEnrollButton() {
-    setState(() {
-      isEnrolled = true;
-    });
+    if (!isQuizTaken) {
+      updateQuizStatus();
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => quizquestions()),
+    );
   }
 
   Widget buildVideoPlayer() {
@@ -100,12 +196,6 @@ class _CoursePlayerState extends State<CoursePlayer> {
         ],
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _youtubeController.dispose();
-    super.dispose();
   }
 
   @override
@@ -235,8 +325,37 @@ class _CoursePlayerState extends State<CoursePlayer> {
           ],
         ),
       ),
-      bottomNavigationBar: true
-          ? null
+      bottomNavigationBar: isQuizTaken
+          ? Padding(
+              padding: EdgeInsets.symmetric(
+                vertical:
+                    MediaQuery.of(context).size.height * paddingVertical * 0.5,
+                horizontal:
+                    MediaQuery.of(context).size.width * paddingHorizontal * 0.5,
+              ),
+              child: GestureDetector(
+                onTap: null,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                        MediaQuery.of(context).size.width * fontSize * 0.5),
+                    color: Color(0xFF674AEF),
+                  ),
+                  child: Text(
+                    'Quiz Already attempted',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontSize:
+                          MediaQuery.of(context).size.width * fontSize * 1.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            )
           : Padding(
               padding: EdgeInsets.symmetric(
                 vertical:
@@ -255,11 +374,11 @@ class _CoursePlayerState extends State<CoursePlayer> {
                     color: Color(0xFF674AEF),
                   ),
                   child: Text(
-                    'Enroll Course',
+                    'Take Quiz',
                     style: TextStyle(
                       fontFamily: 'RobotoMono',
                       fontSize:
-                          MediaQuery.of(context).size.width * fontSize * 0.8,
+                          MediaQuery.of(context).size.width * fontSize * 1.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
