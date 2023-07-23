@@ -76,8 +76,8 @@ class _SignupScreenState extends State<SignupScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-
-    if (!value.contains('@')) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
       return 'Invalid email';
     }
     return null;
@@ -88,8 +88,9 @@ class _SignupScreenState extends State<SignupScreen> {
       return 'Please enter your password';
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    // Ensuring the password contains at least one uppercase letter, one lowercase letter, and one digit
+    if (!RegExp(r'^(?=.[a-z])(?=.[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+      return 'Password must be at least 6 characters and contain at least\none uppercase letter, one lowercase letter, and one digit';
     }
     return null;
   }
@@ -126,10 +127,9 @@ class _SignupScreenState extends State<SignupScreen> {
           'lastName': lastName,
           'phoneNumber': phoneNumber,
           'email': email,
-          'points': 100,
-          'userRewards': [],
-          'userCourses': [],
-          'quizTaken': [],
+          'userRewards': [0],
+          'userCourses': [0],
+          'quizTaken': ['None'],
           // Add additional fields as needed
         };
 
