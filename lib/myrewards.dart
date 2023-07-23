@@ -19,10 +19,10 @@ class _myrewardsState extends State<myrewards> {
   final double paddingHorizontal = 0.05;
 
   final DatabaseReference _myrewardsRef =
-      FirebaseDatabase.instance.reference().child('Users');
+      FirebaseDatabase.instance.ref().child('Users');
   List<Reward> myrewardList = [];
   String userPoints = '';
-  var userReward = [];
+  Map<dynamic, dynamic> userReward = {};
 
   @override
   void initState() {
@@ -60,9 +60,9 @@ class _myrewardsState extends State<myrewards> {
                   snapshot.value as Map<dynamic, dynamic>;
               List<Reward> fetchedmyRewards = [];
 
-              userRewards.forEach((rewardIndex) {
-                if (data.containsKey(rewardIndex.toString())) {
-                  Reward reward = Reward.fromMap(data[rewardIndex.toString()]);
+              userRewards.forEach((rewardKey) {
+                if (data.containsKey(rewardKey.toString())) {
+                  Reward reward = Reward.fromMap(data[rewardKey.toString()]);
                   fetchedmyRewards.add(reward);
                 }
               });

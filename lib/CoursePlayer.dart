@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:knowledgevault/mycourses.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 
-class CourseDetailsPage extends StatefulWidget {
+class CoursePlayer extends StatefulWidget {
   final Map<String, dynamic> arguments;
-  late final int enrolledCourseKey;
 
-  CourseDetailsPage({required this.arguments, required this.enrolledCourseKey});
+  CoursePlayer({required this.arguments});
 
   @override
-  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+  _CoursePlayerState createState() => _CoursePlayerState();
 }
 
-class _CourseDetailsPageState extends State<CourseDetailsPage> {
+class _CoursePlayerState extends State<CoursePlayer> {
   final double fontSize = 0.04;
   final double paddingVertical = 0.03;
   final double paddingHorizontal = 0.05;
@@ -48,54 +44,14 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
     }
   }
 
-  void updateUserCourses(enrolledCourseKey) async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      DatabaseReference userRef =
-          FirebaseDatabase.instance.ref().child('Users');
-      Query query = userRef.orderByChild('email').equalTo(user.email);
-
-      DataSnapshot snapshot = (await query.once()).snapshot;
-      Map<dynamic, dynamic>? userData =
-          snapshot.value as Map<dynamic, dynamic>?;
-
-      if (userData != null) {
-        String userId = userData.keys.first;
-        Map<dynamic, dynamic> userRecord = userData.values.first;
-
-        List<dynamic> userCourses = List.from(userRecord['userCourses'] ?? []);
-        var courseKey = widget.enrolledCourseKey;
-
-        if (!userCourses.contains(enrolledCourseKey)) {
-          userCourses.add(enrolledCourseKey);
-        }
-
-        userRef.child(userId).update({
-          'userCourses': userCourses,
-        }).then((_) {
-          setState(() {
-            isEnrolled = true;
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const mycourses(),
-            ),
-          );
-        }).catchError((error) {
-          print('Failed to update courses: $error');
-        });
-      }
-    }
-  }
-
   void handleEnrollButton() {
-    updateUserCourses(widget.enrolledCourseKey);
+    setState(() {
+      isEnrolled = true;
+    });
   }
 
   Widget buildVideoPlayer() {
-    if (isEnrolled) {
+    if (true) {
       return YoutubePlayer(
         controller: _youtubeController,
         showVideoProgressIndicator: true,
@@ -194,7 +150,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                       color: Colors.indigo[50],
                     ),
                     child: Text(
-                      "   Course Details",
+                      "   Courses Details",
                       style: TextStyle(
                         fontFamily: 'RobotoMono',
                         fontStyle: FontStyle.normal,
@@ -279,7 +235,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
           ],
         ),
       ),
-      bottomNavigationBar: isEnrolled
+      bottomNavigationBar: true
           ? null
           : Padding(
               padding: EdgeInsets.symmetric(

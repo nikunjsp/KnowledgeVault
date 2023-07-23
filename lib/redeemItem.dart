@@ -54,7 +54,7 @@ class _redeemItemState extends State<redeemItem> {
     }
   }
 
-  void updatePoints(updatedUserPoints, redeemRewardKey) async {
+  void updatePoints(int updatedUserPoints, int redeemRewardKey) async {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
@@ -69,21 +69,22 @@ class _redeemItemState extends State<redeemItem> {
       if (userData != null) {
         String userId = userData.keys.first;
         Map<dynamic, dynamic> userRecord = userData.values.first;
+        List<dynamic> userRewards = List.from(userRecord['userRewards'] ?? []);
 
-        List<dynamic> userRewards = userRecord['userRewards'] ?? [];
-        var rewardKey = widget.key;
-
-        // if (!userRewards.contains(redeemRewardKey)) {
         userRewards.add(redeemRewardKey);
-        // }
 
         userRef.child(userId).update({
           'points': updatedUserPoints,
-          'userRewards': userRewards
+          'userRewards': userRewards,
         }).then((_) {
           setState(() {
             userPoints = updatedUserPoints.toString();
           });
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => myrewards()),
+          );
         }).catchError((error) {
           print('Failed to update points: $error');
         });
@@ -207,20 +208,14 @@ class _redeemItemState extends State<redeemItem> {
                                   textStyle: const TextStyle(fontSize: 20),
                                 ),
                                 onPressed: () {
-                                  if (int.parse(userPoints) >= widget.points) {
+                                  int requiredPoints = widget.points;
+                                  if (int.parse(userPoints) >= requiredPoints) {
                                     int updatedUserPoints =
-                                        int.parse(userPoints) - widget.points;
+                                        int.parse(userPoints) - requiredPoints;
                                     int redeemRewardKey =
                                         widget.redeemRewardKey;
                                     updatePoints(
                                         updatedUserPoints, redeemRewardKey);
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const myrewards()),
-                                    );
                                   } else {
                                     showDialog(
                                       context: context,
