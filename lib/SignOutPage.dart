@@ -6,6 +6,7 @@ class SignOutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Sign Out',
           style: TextStyle(color: Colors.white),

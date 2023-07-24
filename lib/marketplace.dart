@@ -73,7 +73,8 @@ class _marketplaceState extends State<marketplace> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text('Rewards'),
+        title: Text('Marketplace'),
+        automaticallyImplyLeading: false,
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),
@@ -104,36 +105,48 @@ class _marketplaceState extends State<marketplace> {
           ),
         ],
       ),
-      body: ListView(
+      body: Container(
+        height: double.infinity,
+      child : ListView(
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                GridView.builder(
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: rewardList.length,
                   shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio:
-                        (MediaQuery.of(context).size.height) / (1 * 350),
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                  ),
                   itemBuilder: (context, index) {
                     return InkWell(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: const Color.fromRGBO(116, 85, 247, 0.1),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
+                      child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 20, left: 10, right: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromRGBO(116, 85, 247, 0.1),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                      
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 20),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              
+                                              Text(
                               rewardList[index].name ?? '',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
@@ -154,10 +167,11 @@ class _marketplaceState extends State<marketplace> {
                                 fontSize: 10,
                                 color: Color.fromRGBO(131, 136, 139, 1),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            ),               
+                              
+                            const SizedBox(height: 10),               
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   'Price: ${rewardList[index].points}',
@@ -171,7 +185,7 @@ class _marketplaceState extends State<marketplace> {
                                 ),
                                 TextButton(
                                   style: TextButton.styleFrom(
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: Color.fromRGBO(116, 85, 247, 1),
                                     foregroundColor: Colors.white,
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
@@ -198,10 +212,17 @@ class _marketplaceState extends State<marketplace> {
                                   child: const Text('Redeem Now'),
                                 ),
                               ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
                     );
                   },
                 ),
@@ -209,6 +230,7 @@ class _marketplaceState extends State<marketplace> {
             ),
           ),
         ],
+      ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

@@ -131,116 +131,132 @@ class _redeemItemState extends State<redeemItem> {
           ),
         ],
       ),
-      body: ListView(
+      body: Container ( 
+      height: double.infinity,
+      child : ListView(
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                GridView.builder(
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: redeemRewardlist.length,
                   shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio:
-                        (MediaQuery.of(context).size.height) / (1 * 1500),
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                  ),
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Color.fromARGB(24, 255, 255, 255),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(0),
-                              child: Image.network(
-                                widget.picture,
-                                fit: BoxFit.cover,
-                                height: MediaQuery.of(context).size.width * 0.4,
-                                width: double.infinity,
+
+                      child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 20, left: 10, right: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromRGBO(116, 85, 247, 0.1),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${widget.name}',
-                                  style: const TextStyle(
-                                    fontFamily: 'RobotoMono',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 30,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              textAlign: TextAlign.justify,
-                              '${widget.description}',
-                              style: const TextStyle(
-                                fontFamily: 'RobotoMono',
-                                fontStyle: FontStyle.italic,
-                                fontSize: 10,
-                                color: Color.fromRGBO(131, 136, 139, 1),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 30),
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  fixedSize: const Size(300, 20),
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.deepPurpleAccent,
-                                  textStyle: const TextStyle(fontSize: 20),
-                                ),
-                                onPressed: () {
-                                  int requiredPoints = widget.points;
-                                  if (int.parse(userPoints) >= requiredPoints) {
-                                    int updatedUserPoints =
-                                        int.parse(userPoints) - requiredPoints;
-                                    int redeemRewardKey =
-                                        widget.redeemRewardKey;
-                                    updatePoints(
-                                        updatedUserPoints, redeemRewardKey);
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title:
-                                            const Text('Insufficient Points'),
-                                        content: const Text(
-                                            'You do not have enough points to redeem this reward.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text('OK'),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 10),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            child: Image.network(
+                                              widget.picture,
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.width * 0.4,
+                      width: double.infinity,
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: const Text('Redeem Now'),
-                              ),
-                            ),
-                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              
+                                              Text(
+                        '${widget.name}',
+                        style: const TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 28,
+                          color: Colors.black,
                         ),
                       ),
+                                              const SizedBox(height: 10),
+                                              
+                                              Text(
+                        '${widget.description}',
+                        style: const TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                          color: Color.fromRGBO(131, 136, 139, 1),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Padding(
+                            padding: const EdgeInsets.only(top: 20, bottom: 20),
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                fixedSize: const Size(300, 20),
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.deepPurpleAccent,
+                                textStyle: const TextStyle(fontSize: 20),
+                              ),
+                              onPressed: () {
+                                int requiredPoints = widget.points;
+                                if (int.parse(userPoints) >= requiredPoints) {
+                                  int updatedUserPoints =
+                                      int.parse(userPoints) - requiredPoints;
+                                  int redeemRewardKey = widget.redeemRewardKey;
+                                  updatePoints(updatedUserPoints, redeemRewardKey);
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Insufficient Points'),
+                                      content: const Text(
+                                          'You do not have enough points to redeem this reward.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text('Redeem Now'),
+                            ),
+                          ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                     );
                   },
                 ),
@@ -249,6 +265,7 @@ class _redeemItemState extends State<redeemItem> {
           ),
         ],
       ),
+    ),
     );
   }
 }

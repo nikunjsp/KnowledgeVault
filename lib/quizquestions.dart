@@ -78,14 +78,6 @@ class _quizquestionsState extends State<quizquestions> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-              color: Colors.black,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.close)),
-        ],
       ),
       body: Center(
         child: Column(

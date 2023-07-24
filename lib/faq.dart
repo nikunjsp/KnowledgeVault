@@ -30,6 +30,7 @@ class _FaqState extends State<faq> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         height: double.infinity,

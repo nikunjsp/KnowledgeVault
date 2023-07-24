@@ -86,6 +86,7 @@ void _fetchUserData() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Profile',
           style: TextStyle(color: Colors.white),

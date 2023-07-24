@@ -86,7 +86,8 @@ class _mycoursesState extends State<mycourses> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text('Courses'),
+        title: const Text('My Courses'),
+        automaticallyImplyLeading: false,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),

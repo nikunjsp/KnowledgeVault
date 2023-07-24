@@ -22,6 +22,7 @@ class _BarState extends State<Bar>  {
         child: AppBar(
           backgroundColor: Color.fromRGBO(116, 85, 247, 1),
           title: const Text('KnowledgeVault', style: TextStyle(fontFamily: 'RobotoMono', fontSize: 20 ,color: Colors.white)),
+          automaticallyImplyLeading: false,
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.settings,color: Colors.white,),
