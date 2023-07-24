@@ -141,6 +141,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Edit Profile',
           style: TextStyle(color: Colors.white),
@@ -149,7 +150,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: Colors.black,
+          color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
           },

@@ -3,10 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'SignUpScreen.dart';
 import 'HomePage.dart';
 
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
+
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
@@ -15,11 +17,13 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+
   void _togglePasswordVisibility() {
     setState(() {
       _obscureText = !_obscureText;
     });
   }
+
 
   @override
   void dispose() {
@@ -27,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
+
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -39,21 +44,25 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
+
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
     }
 
-    if (!RegExp(r'^(?=.[a-z])(?=.[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
       return 'Please enter valid password';
     }
     return null;
   }
 
+
   void _submitForm() async {
     if (_formKey.currentState?.validate() == true) {
       String email = _emailController.text.trim();
       String password = _passwordController.text;
+
 
       try {
         UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -91,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+
   void _goToSignupScreen() {
     Navigator.push(
       context,
@@ -98,8 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+
   void _resetPassword() async {
     String email = _emailController.text.trim();
+
 
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -147,7 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurpleAccent,
+        centerTitle: true,
         title: Text('Welcome Back!'),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Padding(

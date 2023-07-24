@@ -26,6 +26,7 @@ class SettingsPage extends StatelessWidget {
     );
           },
         ),
+        centerTitle: true,
         title: const Text(
           'Settings',
           style: TextStyle(

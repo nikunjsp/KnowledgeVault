@@ -88,6 +88,8 @@ class _myrewardsState extends State<myrewards> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        title: Text('My Rewards'),
+        automaticallyImplyLeading: false,
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20),
@@ -118,36 +120,49 @@ class _myrewardsState extends State<myrewards> {
           ),
         ],
       ),
-      body: ListView(
+      body: Container ( 
+        height : double.infinity,
+      child : ListView(
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                GridView.builder(
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: myrewardList.length,
                   shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio:
-                        (MediaQuery.of(context).size.height) / (1 * 350),
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                  ),
                   itemBuilder: (context, index) {
                     return InkWell(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: const Color.fromRGBO(116, 85, 247, 0.1),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
+
+                      child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 20, left: 10, right: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromRGBO(116, 85, 247, 0.1),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                      
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 20),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              
+                                              Text(
                               myrewardList[index].name ?? '',
                               style: const TextStyle(
                                 fontFamily: 'RobotoMono',
@@ -168,10 +183,11 @@ class _myrewardsState extends State<myrewards> {
                                 fontSize: 10,
                                 color: Color.fromRGBO(131, 136, 139, 1),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            ),               
+                              
+                            const SizedBox(height: 10),               
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   'Price: ${myrewardList[index].points}',
@@ -186,7 +202,7 @@ class _myrewardsState extends State<myrewards> {
                                 Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
-                                    color: Colors.blue,
+                                    color: Color.fromRGBO(116, 85, 247, 1),
                                   ),
                                   child: TextButton(
                                     onPressed: null,
@@ -203,10 +219,17 @@ class _myrewardsState extends State<myrewards> {
                                   ),
                                 ),
                               ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
                     );
                   },
                 ),
@@ -214,6 +237,7 @@ class _myrewardsState extends State<myrewards> {
             ),
           ),
         ],
+      ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

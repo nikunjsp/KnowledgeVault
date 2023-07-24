@@ -263,8 +263,10 @@ class _CoursePlayerState extends State<CoursePlayer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
+                                Flexible(
+                                  child: Text(
                                   coursename,
                                   style: TextStyle(
                                     fontFamily: 'RobotoMono',
@@ -276,9 +278,15 @@ class _CoursePlayerState extends State<CoursePlayer> {
                                     color: Colors.black,
                                   ),
                                 ),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.1),
+                              ),
+                              Row(
+                                children: [
+                                    Icon(
+                                      Icons.timer,
+                                      color: Colors.grey,
+                                      size: 16,
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   duration,
                                   style: TextStyle(
@@ -287,17 +295,19 @@ class _CoursePlayerState extends State<CoursePlayer> {
                                     fontSize:
                                         MediaQuery.of(context).size.width *
                                             fontSize *
-                                            0.8,
+                                            1.0,
                                     fontWeight: FontWeight.w500,
                                     color: Color.fromRGBO(131, 136, 139, 1),
                                   ),
                                 ),
-                              ],
+                                  ],
+                              )
+                            ],
                             ),
                             SizedBox(
                                 height: MediaQuery.of(context).size.width *
                                     fontSize *
-                                    0.3),
+                                    0.6),
                             Text(
                               description,
                               style: TextStyle(
@@ -305,7 +315,7 @@ class _CoursePlayerState extends State<CoursePlayer> {
                                 fontStyle: FontStyle.normal,
                                 fontSize: MediaQuery.of(context).size.width *
                                     fontSize *
-                                    0.6,
+                                    0.8,
                                 fontWeight: FontWeight.w500,
                                 color: Color.fromRGBO(131, 136, 139, 1),
                               ),

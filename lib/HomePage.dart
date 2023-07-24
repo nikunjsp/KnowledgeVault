@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
       FirebaseDatabase.instance.ref().child('Users');
   List<dynamic> enrolledCourse = [];
   bool isEnrolled = false;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -97,18 +98,21 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 40),
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: const TextField(
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
                 cursorColor: Colors.grey,
                 decoration: InputDecoration(
-                  fillColor: Color.fromRGBO(246, 245, 251, 1),
-                  filled: true,
+                  hintText: 'Search Courses',
+                  prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  hintText: 'Search your topic',
                   hintStyle: TextStyle(
                       color: Color.fromRGBO(131, 136, 139, 1), fontSize: 12),
-                  prefixIcon: Icon(Icons.search),
                 ),
               ),
             ),
@@ -138,162 +142,175 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     itemCount: courselist.length,
                     itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          checkEnroll(index);
-                          print(isEnrolled);
-                          isEnrolled
-                              ? Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        CoursePlayer(arguments: {
-                                      'coursename':
-                                          courselist[index].coursename ?? '',
-                                      'duration':
-                                          courselist[index].duration ?? '',
-                                      'description':
-                                          courselist[index].description ?? '',
-                                      'thumbnail':
-                                          courselist[index].thumbnail ?? '',
-                                      'video': courselist[index].video ?? '',
-                                    }, enrolledCourseKey: index),
-                                  ),
-                                )
-                              : Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        CourseDetailsPage(arguments: {
-                                      'coursename':
-                                          courselist[index].coursename ?? '',
-                                      'duration':
-                                          courselist[index].duration ?? '',
-                                      'description':
-                                          courselist[index].description ?? '',
-                                      'thumbnail':
-                                          courselist[index].thumbnail ?? '',
-                                      'video': courselist[index].video ?? '',
-                                    }, enrolledCourseKey: index),
-                                  ),
-                                );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 20, left: 10, right: 10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: const Color.fromRGBO(116, 85, 247, 0.1),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 10),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          child: Image.network(
+                      if (_searchQuery.isEmpty ||
+                          courselist[index]
+                              .coursename!
+                              .toLowerCase()
+                              .contains(_searchQuery.toLowerCase()) ||
+                          courselist[index]
+                              .description!
+                              .toLowerCase()
+                              .contains(_searchQuery.toLowerCase())) {
+                        return InkWell(
+                          onTap: () {
+                            checkEnroll(index);
+                            print(isEnrolled);
+                            isEnrolled
+                                ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          CoursePlayer(arguments: {
+                                        'coursename':
+                                            courselist[index].coursename ?? '',
+                                        'duration':
+                                            courselist[index].duration ?? '',
+                                        'description':
+                                            courselist[index].description ?? '',
+                                        'thumbnail':
                                             courselist[index].thumbnail ?? '',
-                                            fit: BoxFit.cover,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.4,
-                                            width: double.infinity,
+                                        'video': courselist[index].video ?? '',
+                                      }, enrolledCourseKey: index),
+                                    ),
+                                  )
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          CourseDetailsPage(arguments: {
+                                        'coursename':
+                                            courselist[index].coursename ?? '',
+                                        'duration':
+                                            courselist[index].duration ?? '',
+                                        'description':
+                                            courselist[index].description ?? '',
+                                        'thumbnail':
+                                            courselist[index].thumbnail ?? '',
+                                        'video': courselist[index].video ?? '',
+                                      }, enrolledCourseKey: index),
+                                    ),
+                                  );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 20, left: 10, right: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromRGBO(116, 85, 247, 0.1),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 10),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            child: Image.network(
+                                              courselist[index].thumbnail ?? '',
+                                              fit: BoxFit.cover,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              width: double.infinity,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    courselist[index]
-                                                            .coursename ??
-                                                        '',
-                                                    style: const TextStyle(
-                                                      fontFamily: 'RobotoMono',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: Colors.black,
-                                                    ),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.timer,
-                                                      color: Colors.grey,
-                                                      size: 16,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
                                                       courselist[index]
-                                                              .duration ??
+                                                              .coursename ??
                                                           '',
                                                       style: const TextStyle(
                                                         fontFamily:
                                                             'RobotoMono',
-                                                        fontStyle:
-                                                            FontStyle.normal,
-                                                        fontSize: 12,
                                                         fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Color.fromRGBO(
-                                                            131, 136, 139, 1),
+                                                            FontWeight.w600,
+                                                        fontSize: 14,
+                                                        color: Colors.black,
                                                       ),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              courselist[index].description ??
-                                                  '',
-                                              style: const TextStyle(
-                                                fontFamily: 'RobotoMono',
-                                                fontStyle: FontStyle.normal,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black54,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.timer,
+                                                        color: Colors.grey,
+                                                        size: 16,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        courselist[index]
+                                                                .duration ??
+                                                            '',
+                                                        style: const TextStyle(
+                                                          fontFamily:
+                                                              'RobotoMono',
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: Color.fromRGBO(
+                                                              131, 136, 139, 1),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 10),
-                                          ],
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                courselist[index].description ??
+                                                    '',
+                                                style: const TextStyle(
+                                                  fontFamily: 'RobotoMono',
+                                                  fontStyle: FontStyle.normal,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black54,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        return Container();
+                      }
                     },
                   ),
                 ],
