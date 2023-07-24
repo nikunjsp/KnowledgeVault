@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -10,6 +12,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
 
+  DatabaseReference _userRef = FirebaseDatabase.instance.reference().child('Users');
+
   @override
   void dispose() {
     _existingPasswordController.dispose();
@@ -18,32 +22,81 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
-  void _resetPassword() {
-    // Handle reset password button tap
-    // Add your logic here
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your new password';
+    }
+
+    // Ensuring the password contains at least one uppercase letter, one lowercase letter, and one digit
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+      return 'Password must be at least 6 characters and contain at least\none uppercase letter, one lowercase letter, and one digit';
+    }
+    return null;
+  }
+
+  void _resetPassword() async {
     String existingPassword = _existingPasswordController.text;
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmPasswordController.text;
 
     // Validate and process the passwords
     if (existingPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-      // Display an error message or show a snackbar indicating missing fields
+      _showSnackBar('Please fill in all the fields.');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      // Display an error message or show a snackbar indicating password mismatch
+      _showSnackBar('New password and confirm password do not match.');
       return;
     }
 
-    // Proceed with resetting the password
-    // Add your logic here
+    String? newPasswordError = _validatePassword(newPassword);
+    if (newPasswordError != null) {
+      _showSnackBar(newPasswordError);
+      return;
+    }
+
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        AuthCredential credential = EmailAuthProvider.credential(email: user.email!, password: existingPassword);
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+
+        _showSnackBar('Password reset successful.');
+
+      
+        String uid = user.uid;
+        DatabaseReference userRef = _userRef.child(uid);
+        await userRef.update({'password': newPassword});
+
+      
+        _existingPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+      } else {
+        _showSnackBar('User not found.');
+      }
+    } catch (e) {
+      _showSnackBar('Wrong existing password: Try again!');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Reset Password',
           style: TextStyle(color: Colors.white),
@@ -63,19 +116,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+            TextField(
               controller: _existingPasswordController,
               decoration: InputDecoration(labelText: 'Existing Password'),
               obscureText: true,
             ),
             SizedBox(height: 10),
-            TextFormField(
+            TextField(
               controller: _newPasswordController,
               decoration: InputDecoration(labelText: 'New Password'),
               obscureText: true,
             ),
             SizedBox(height: 10),
-            TextFormField(
+            TextField(
               controller: _confirmPasswordController,
               decoration: InputDecoration(labelText: 'Confirm Password'),
               obscureText: true,
@@ -86,12 +139,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: ElevatedButton(
                   onPressed: _resetPassword,
-                  child: Text('Reset Password'),
                   style: ElevatedButton.styleFrom(
-                    primary: Color.fromRGBO(116, 85, 247, 0.1),
+                    backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                     padding: EdgeInsets.all(16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.black,
                     ),
                   ),
                 ),

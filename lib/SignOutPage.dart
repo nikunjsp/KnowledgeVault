@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'OptionScreen.dart';
 
 class SignOutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Sign Out',
           style: TextStyle(color: Colors.white),
@@ -44,8 +46,10 @@ class SignOutPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle sign out button tap
-                    // Add your logic here
+                    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => OptionScreen()),
+            );
                   },
                   child: Text('Sign Out'),
                   style: ElevatedButton.styleFrom(
@@ -63,7 +67,7 @@ class SignOutPage extends StatelessWidget {
                   },
                   child: Text('Cancel'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.grey[300],
+                    backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                     onPrimary: Colors.black,
                     padding: EdgeInsets.all(16),
                     shape: RoundedRectangleBorder(
@@ -79,4 +83,3 @@ class SignOutPage extends StatelessWidget {
     );
   }
 }
-

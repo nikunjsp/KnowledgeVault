@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:knowledgevault/HomePage.dart';
 import 'ProfilePage.dart';
 import 'PrivacyPolicyPage.dart';
 import 'AboutPage.dart';
@@ -17,9 +18,15 @@ class SettingsPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
           },
         ),
+        centerTitle: true,
         title: const Text(
           'Settings',
           style: TextStyle(
@@ -32,21 +39,20 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          
           children: [
             const SizedBox(height: 20),
             
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Handle profile button tap
-                // Add your logic here
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 
                 shape: RoundedRectangleBorder(
@@ -58,31 +64,32 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.person,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Profile',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                                     fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
+            
             ElevatedButton(
               onPressed: () {
-                // Handle privacy policy button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -92,15 +99,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.lock,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Privacy Policy',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),
@@ -108,15 +117,13 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Handle about section button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AboutPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -126,15 +133,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.info,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'About',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),
@@ -142,15 +151,13 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Handle sign out button tap
-                // Add your logic here
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SignOutPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(116, 85, 247, 0.1),
+                backgroundColor: const Color.fromRGBO(246, 245, 251, 1),
                 padding: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -160,15 +167,17 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.logout,
-                    color: Colors.black,
+                    color: Color.fromRGBO(116, 85, 247, 1),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Sign Out',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                    fontFamily: 'RobotoMono',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    ),
                   ),
                 ],
               ),

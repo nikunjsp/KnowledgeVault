@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:knowledgevault/question_model.dart';
 import 'package:knowledgevault/widgets/optionCard.dart';
 import '../widgets/questionWidget.dart';
-//import '../widgets/nextButton.dart';
-//import 'question_model.dart';
 import 'results.dart';
 
 class quizquestions extends StatefulWidget {
@@ -31,6 +29,10 @@ class _quizquestionsState extends State<quizquestions> {
         id: '40',
         options: {'5': false, '40': true, '3': false, '4': false},
         title: "What is 2 * 20"),
+    question(
+        id: '30',
+        options: {'1': true, '3': false, '31': false, '4': false},
+        title: "What is 2 / 2"),
   ];
 
   int _questionIndex = 0;
@@ -76,14 +78,6 @@ class _quizquestionsState extends State<quizquestions> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-              color: Colors.black,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.close)),
-        ],
       ),
       body: Center(
         child: Column(
@@ -146,11 +140,6 @@ class _quizquestionsState extends State<quizquestions> {
           ],
         ),
       ),
-
-      //floatingActionButton: nextButton(
-      //nextQuestion: nextQuestion,
-      //),
-      //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'LoginScreen.dart';
+import 'AuthService.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -15,10 +19,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class SignupScreen extends StatefulWidget {
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
+
 
 class _SignupScreenState extends State<SignupScreen> {
   bool _passwordVisible = false;
@@ -30,6 +36,10 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
+  final DatabaseReference _userRef =
+      FirebaseDatabase.instance.reference().child('Users');
+
 
   @override
   void dispose() {
@@ -42,12 +52,14 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+
   String? _validateFirstName(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your first name';
     }
     return null;
   }
+
 
   String? _validateLastName(String? value) {
     if (value == null || value.isEmpty) {
@@ -56,10 +68,12 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
+
   String? _validatePhoneNumber(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your phone number';
     }
+
 
     if (value.length != 10) {
       return 'Invalid phone number';
@@ -67,27 +81,32 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-
-    if (!value.contains('@')) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
       return 'Invalid email';
     }
     return null;
   }
+
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+
+    // Ensuring the password contains at least one uppercase letter, one lowercase letter, and one digit
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$').hasMatch(value)) {
+      return 'Password must be at least 6 characters and contain at least\none uppercase letter, one lowercase letter, and one digit';
     }
     return null;
   }
+
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -99,25 +118,54 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
-  void _submitForm() {
+
+  void _submitForm() async {
     if (_formKey.currentState?.validate() == true) {
       String firstName = _firstNameController.text;
       String lastName = _lastNameController.text;
       String phoneNumber = _phoneNumberController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
-      String confirmPassword = _confirmPasswordController.text;
 
-      bool isSignedUp = true;
 
-      if (isSignedUp) {
+      try {
+        // Register user with email and password
+        await _authService.registerWithEmailAndPassword(email, password);
+        // Handle successful registration
+
+
+        // Generate a unique user ID
+        String? userId = _userRef.push().key ?? '';
+
+
+        // Create a map of user data
+        Map<String, dynamic> userData = {
+          'firstName': firstName,
+          'lastName': lastName,
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'points': 100,
+          'userRewards': [0],
+          'userCourses': [0],
+          'quizTaken': ['None'],
+          // Add additional fields as needed
+        };
+
+
+        // Store the user data in the database
+        _userRef.child(userId).set(userData);
+
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
+      } catch (e) {
+        // Handle registration errors
       }
     }
   }
+
 
   void _goToLoginScreen() {
     Navigator.push(
@@ -126,12 +174,15 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurpleAccent,
-        title: Text('Sign Up'),
+        centerTitle: true,
+        title: Text('Welcome to the KnowledgeVault'),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -207,7 +258,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                       child: Icon(
-                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                        _passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
                   ),
@@ -229,7 +282,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                       child: Icon(
-                        _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _confirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
                   ),

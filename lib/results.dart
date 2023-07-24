@@ -1,15 +1,69 @@
 import 'package:flutter/material.dart';
 import 'HomePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class results extends StatelessWidget {
   const results({super.key, required this.score});
 
   final int score;
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    int earnedPoint = score * 10;
-    int percentage = ((score / 10) * 100).round();
+    int earnedPoint = score * 20;
+    int percentage = ((score / 5) * 100).round();
+
+    void updatePoints(int updatedUserPoints) async {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.reference().child('Users');
+        Query query = userRef.orderByChild('email').equalTo(user.email);
+
+        DataSnapshot snapshot = (await query.once()).snapshot;
+        Map<dynamic, dynamic>? userData =
+            snapshot.value as Map<dynamic, dynamic>?;
+
+        if (userData != null) {
+          String userId = userData.keys.first;
+
+          userRef.child(userId).update({
+            'points': updatedUserPoints,
+          }).catchError((error) {
+            print('Failed to update points: $error');
+          });
+        }
+      }
+    }
+
+    void _updateUserPoints() async {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.reference().child('Users');
+        Query query = userRef.orderByChild('email').equalTo(user.email);
+
+        DataSnapshot snapshot = (await query.once()).snapshot;
+        Map<dynamic, dynamic>? userData =
+            snapshot.value as Map<dynamic, dynamic>?;
+
+        if (userData != null) {
+          Map<dynamic, dynamic> userRecord = userData.values.first;
+          int currentPoints = userRecord['points'] ?? 0;
+          int updatedUserPoints = currentPoints + earnedPoint;
+          print("========================================");
+          print(updatedUserPoints);
+          print("========================================");
+
+          updatePoints(updatedUserPoints);
+        }
+      }
+    }
+
+    _updateUserPoints();
 
     return Scaffold(
       appBar: AppBar(
