@@ -26,7 +26,7 @@ KnowledgeVault is an innovative online educational learning application that rew
 ### Steps
 1. Clone the repository:
    ```sh
-   git clone <https://github.com/nikunjsp/KnowledgeVault>
+   git clone https://github.com/nikunjsp/KnowledgeVault
    cd knowledgevault
    ```
 2. Install dependencies:
